@@ -1,0 +1,10 @@
+{
+  "Name": "Schedule Viewer",
+  "Author": "PhillipPhil",
+  "Version": "1.0.0",
+  "Description": "Shows NPCs schedule for the current day based on current world conditions.",
+  "UniqueID": "PhillipPhil.ScheduleViewer",
+  "EntryDll": "ScheduleViewer.dll",
+  "MinimumApiVersion": "3.0.0",
+  "UpdateKeys": []
+}
