@@ -387,6 +387,7 @@ namespace ScheduleViewer
                 { "BathHouse_MensLocker", Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11110") },
                 { "BathHouse_Pool", Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11110") },
                 { "BathHouse_WomensLocker", Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11110") },
+                { "Beach", Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11174") },
                 { "Blacksmith", Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11081") },
                 { "BusStop", Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11066") },
                 { "Club", Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11062") },
