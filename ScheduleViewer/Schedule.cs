@@ -96,7 +96,14 @@ namespace ScheduleViewer
                 string rawSchedule = rawMasterSchedule[dayScheduleName];
 
                 List<ScheduleEntry> scheduleEntries = ParseMasterSchedule(rawSchedule, npc);
-                NpcsWithSchedule.Add(npc.getName(), new NPCSchedule(npc, scheduleEntries, npc.ignoreScheduleToday));
+                try
+                {
+                    NpcsWithSchedule.Add(npc.getName(), new NPCSchedule(npc, scheduleEntries, npc.ignoreScheduleToday));
+                }
+                catch (ArgumentException)
+                {
+                    ModEntry.Console.Log($"Warning! Found an NPC whose name is already in the list. This means you have 2 or more NPCs with the same name. The schedule for \"{npc.getName()}\" might not be accurate.", LogLevel.Warn);
+                }
             }
 
             Date = Game1.Date;
