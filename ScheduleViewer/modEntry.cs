@@ -34,7 +34,10 @@ namespace ScheduleViewer
             Config = helper.ReadConfig<ModConfig>();
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
             helper.Events.Input.ButtonsChanged += OnButtonsChanged;
-            helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
+            if (helper.ModRegistry.IsLoaded("Bouhm.NPCMapLocations"))
+            {
+                helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
+            }
         }
 
 
@@ -44,8 +47,13 @@ namespace ScheduleViewer
         /// <inheritdoc cref="IGameLoopEvents.SaveLoaded"/>
         private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
         {
-            var locationSettings = this.Helper.GameContent.Load<Dictionary<string, JObject>>("Mods/Bouhm.NPCMapLocations/Locations");
-            CustomLocationNames = locationSettings.Where(location => location.Value.SelectToken("MapTooltip.PrimaryText") != null).ToDictionary(location => location.Key, location => location.Value.SelectToken("MapTooltip.PrimaryText").Value<string>());
+            // try loading in display names from NPC Map Locations
+            try
+            {
+                var locationSettings = this.Helper.GameContent.Load<Dictionary<string, JObject>>("Mods/Bouhm.NPCMapLocations/Locations");
+                CustomLocationNames = locationSettings.Where(location => location.Value.SelectToken("MapTooltip.PrimaryText") != null).ToDictionary(location => location.Key, location => location.Value.SelectToken("MapTooltip.PrimaryText").Value<string>());
+            }
+            catch (Exception) { }
         }
 
         /// <inheritdoc cref="IGameLoopEvents.GameLaunched"/>
