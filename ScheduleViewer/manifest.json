@@ -6,5 +6,5 @@
   "UniqueID": "BinaryLip.ScheduleViewer",
   "EntryDll": "ScheduleViewer.dll",
   "MinimumApiVersion": "3.0.0",
-  "UpdateKeys": []
+  "UpdateKeys": [ "Nexus:19305" ]
 }
