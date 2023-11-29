@@ -2,6 +2,7 @@
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -90,9 +91,36 @@ namespace ScheduleViewer
         /// <inheritdoc cref="IInputEvents.ButtonsChanged"/>
         private void OnButtonsChanged(object sender, ButtonsChangedEventArgs e)
         {
-            if (e.Pressed.Contains(Config.ShowSchedulesKey))
+            if (!Context.IsWorldReady)
             {
-                Game1.activeClickableMenu = new SchedulePage();
+                return;
+            }
+            try
+            {
+                // open menu
+                if (e.Pressed.Contains(Config.ShowSchedulesKey))
+                {
+                    // open if no conflict
+                    if (Game1.activeClickableMenu == null)
+                    {
+                        if (Context.IsPlayerFree && !Game1.player.UsingTool && !Game1.player.isEating)
+                        {
+                            Game1.activeClickableMenu = new SchedulePage();
+                        }  
+                    }
+                    // open from GameMenu if it's safe to close the GameMenu
+                    else if (Game1.activeClickableMenu is GameMenu)
+                    {
+                        if (Game1.activeClickableMenu.readyToClose())
+                        {
+                            Game1.activeClickableMenu = new SchedulePage();
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                Console.Log("Error handling key input.", LogLevel.Error);
             }
         }
     }
