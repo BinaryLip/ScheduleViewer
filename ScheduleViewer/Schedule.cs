@@ -4,6 +4,7 @@ using StardewValley;
 using StardewValley.Network;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace ScheduleViewer
@@ -58,15 +59,13 @@ namespace ScheduleViewer
 
     internal class NPCSchedule
     {
-        public NPC NPC { get; set; }
+        public NPC Npc { get; set; }
         public List<ScheduleEntry> Entries { get; set; }
-        public bool IsIgnoringSchedule { get; set; }
 
-        public NPCSchedule(NPC npc, List<ScheduleEntry> entries, bool isIgnoringSchedule = false)
+        public NPCSchedule(NPC npc, List<ScheduleEntry> entries)
         {
-            this.NPC = npc;
+            this.Npc = npc;
             this.Entries = entries;
-            this.IsIgnoringSchedule = isIgnoringSchedule;
         }
     }
 
@@ -76,10 +75,18 @@ namespace ScheduleViewer
         private static Dictionary<string, NPCSchedule> NpcsWithSchedule;
         private static Dictionary<string, string> LocationNames;
 
-        public static Dictionary<string, NPCSchedule> getSchedules()
+        /// <summary>
+        /// Get, parse, and filter NPCs with a schedule. 
+        /// </summary>
+        /// <param name="onlyShowSocializableNPCs">Filter out NPCs the player can't socialize with (ex: Gunther or Sandy before the bus is repaired)</param>
+        /// <param name="onlyShowMetNPCs">Filter out NPCs the player hasn't talked to before.</param>
+        /// <returns></returns>
+        public static IEnumerable<KeyValuePair<string, NPCSchedule>> GetSchedules(bool onlyShowSocializableNPCs = false, bool onlyShowMetNPCs = false)
         {
-            if (Game1.Date == Date && NpcsWithSchedule != null) return NpcsWithSchedule;
-            //ModEntry.Console?.Log($"Needed to generate schedules. Dates match? {Game1.Date == Date} Schedules exists? {NpcsWithSchedule != null}", LogLevel.Info);
+            if (Game1.Date == Date && NpcsWithSchedule != null)
+            {
+                return FilterNPCSchedules(onlyShowSocializableNPCs, onlyShowMetNPCs);
+            }
             List<NPC> npcs = new();
             foreach (var npc in Utility.getAllCharacters())
             {
@@ -98,7 +105,7 @@ namespace ScheduleViewer
                 List<ScheduleEntry> scheduleEntries = ParseMasterSchedule(rawSchedule, npc);
                 try
                 {
-                    NpcsWithSchedule.Add(npc.getName(), new NPCSchedule(npc, scheduleEntries, npc.ignoreScheduleToday));
+                    NpcsWithSchedule.Add(npc.getName(), new NPCSchedule(npc, scheduleEntries));
                 }
                 catch (ArgumentException)
                 {
@@ -107,8 +114,18 @@ namespace ScheduleViewer
             }
 
             Date = Game1.Date;
-            return NpcsWithSchedule;
+            return FilterNPCSchedules(onlyShowSocializableNPCs, onlyShowMetNPCs);
         }
+
+        private static IEnumerable<KeyValuePair<string, NPCSchedule>> FilterNPCSchedules(bool onlyShowSocializableNPCs = false, bool onlyShowMetNPCs = false) =>
+            onlyShowSocializableNPCs || onlyShowMetNPCs ?
+                NpcsWithSchedule.Where(s =>
+                {
+                    NPC npc = s.Value.Npc;
+                    bool hasMet = Game1.player.friendshipData.ContainsKey(npc.Name);
+                    return (npc.CanSocialize || !onlyShowSocializableNPCs) && (hasMet || !onlyShowMetNPCs);
+                }) :
+                NpcsWithSchedule.AsEnumerable();
 
         /// <summary>Slightly adjusted version on the original in-game method NPC::parseMasterSchedule</summary>
         /// <param name="rawData">The raw string data for the days' schedule.</param>
@@ -385,6 +402,7 @@ namespace ScheduleViewer
         public static Dictionary<string, string> GetLocationNames()
         {
             if (LocationNames?.Count > 0) return LocationNames;
+            string farmName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11064", Game1.player.IsLocalPlayer ? Game1.player.farmName.Value : "")?.Trim();
             LocationNames = new Dictionary<string, string>
             {
                 { "AdventureGuild", Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11099") },
@@ -401,6 +419,7 @@ namespace ScheduleViewer
                 { "CommunityCenter", Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11117") },
                 { "Desert", Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11062") },
                 { "ElliottHouse", Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11088") },
+                { "Farm", farmName },
                 { "FishShop", Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11107") },
                 { "Forest", Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11186") },
                 { "HaleyHouse", Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11073") },

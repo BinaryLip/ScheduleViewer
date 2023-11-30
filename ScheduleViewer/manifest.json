@@ -1,7 +1,7 @@
 {
   "Name": "Schedule Viewer",
   "Author": "BinaryLip",
-  "Version": "1.0.4",
+  "Version": "1.1.0",
   "Description": "Shows NPCs' schedule for the current day based on current world conditions.",
   "UniqueID": "BinaryLip.ScheduleViewer",
   "EntryDll": "ScheduleViewer.dll",

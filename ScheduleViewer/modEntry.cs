@@ -20,7 +20,7 @@ namespace ScheduleViewer
         public static IMonitor Console;
         public static IModHelper ModHelper;
         public static Dictionary<string, string> CustomLocationNames = new();
-        public static readonly string[] SortOrderOptions = new string[4] { "Alphabetical Ascending", "Alphabetical Descending", "Hearts Ascending", "Hearts Descending" };
+        public static readonly string[] SortOrderOptions = new string[4];
 
 
         /*********
@@ -32,6 +32,10 @@ namespace ScheduleViewer
         {
             Console = this.Monitor;
             ModHelper = helper;
+            for (int i = 0; i < SortOrderOptions.Length; i++)
+            {
+                SortOrderOptions[i] = this.Helper.Translation.Get($"config.option.sort_options.option_{i}");
+            }
             Config = helper.ReadConfig<ModConfig>();
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
             helper.Events.Input.ButtonsChanged += OnButtonsChanged;
@@ -85,6 +89,20 @@ namespace ScheduleViewer
                 getValue: () => Config.SortOrder,
                 setValue: value => Config.SortOrder = value,
                 allowedValues: SortOrderOptions
+            );
+            configMenu.AddBoolOption(
+                ModManifest,
+                name: () => this.Helper.Translation.Get("config.option.only_show_met_npcs.name"),
+                tooltip: () => this.Helper.Translation.Get("config.option.only_show_met_npcs.description"),
+                getValue: () => Config.OnlyShowMetNPCs,
+                setValue: value => Config.OnlyShowMetNPCs = value
+            );
+            configMenu.AddBoolOption(
+                ModManifest,
+                name: () => this.Helper.Translation.Get("config.option.only_show_socializable_npcs.name"),
+                tooltip: () => this.Helper.Translation.Get("config.option.only_show_socializable_npcs.description"),
+                getValue: () => Config.OnlyShowSocializableNPCs,
+                setValue: value => Config.OnlyShowSocializableNPCs = value
             );
         }
 

@@ -43,32 +43,33 @@ namespace ScheduleViewer
             : base(Game1.uiViewport.Width / 2 - (800 + IClickableMenu.borderWidth * 2) / 2, Game1.uiViewport.Height / 2 - (600 + IClickableMenu.borderWidth * 2) / 2, 800 + 36 + IClickableMenu.borderWidth * 2, 600 + IClickableMenu.borderWidth * 2, showUpperRightCloseButton: true)
         {
             this.slotPosition = initialSlotPosition;
+            // filter npcs
+            IEnumerable<KeyValuePair<string, NPCSchedule>> filteredSchedules = Schedule.GetSchedules(ModEntry.Config.OnlyShowSocializableNPCs, ModEntry.Config.OnlyShowMetNPCs);
             // sort npcs
-            IEnumerable<KeyValuePair<string, NPCSchedule>> NpcScheduleIter;
             if (ModEntry.Config.SortOrder == ModEntry.SortOrderOptions[1])
             {
-                NpcScheduleIter = Schedule.getSchedules().OrderByDescending(x => x.Key);
+                filteredSchedules = filteredSchedules.OrderByDescending(x => x.Key);
             }
             else if (ModEntry.Config.SortOrder == ModEntry.SortOrderOptions[2])
             {
-                NpcScheduleIter = Schedule.getSchedules().OrderBy(x => Game1.player.getFriendshipLevelForNPC(x.Key)).ThenBy(x => x.Key);
+                filteredSchedules = filteredSchedules.OrderBy(x => Game1.player.getFriendshipLevelForNPC(x.Key)).ThenBy(x => x.Key);
             }
             else if (ModEntry.Config.SortOrder == ModEntry.SortOrderOptions[3])
             {
-                NpcScheduleIter = Schedule.getSchedules().OrderByDescending(x => Game1.player.getFriendshipLevelForNPC(x.Key)).ThenBy(x => x.Key);
+                filteredSchedules = filteredSchedules.OrderByDescending(x => Game1.player.getFriendshipLevelForNPC(x.Key)).ThenBy(x => x.Key);
             }
             else
             {
-                NpcScheduleIter = Schedule.getSchedules().OrderBy(x => x.Key);
+                filteredSchedules = filteredSchedules.OrderBy(x => x.Key);
             }
 
             // map schedules into slots
             int itemIndex = 0;
-            foreach (var item in NpcScheduleIter)
+            foreach (var item in filteredSchedules)
             {
                 var f = GetFriendship(item.Key);
                 this.schedules.Add(item.Value);
-                this.sprites.Add(new ClickableTextureComponent("", new Rectangle(base.xPositionOnScreen + IClickableMenu.borderWidth + 4, base.yPositionOnScreen + IClickableMenu.borderWidth + spriteSize / 2, 260, spriteSize), null, "", item.Value.NPC.Sprite.Texture, item.Value.NPC.getMugShotSourceRect(), 4f));
+                this.sprites.Add(new ClickableTextureComponent("", new Rectangle(base.xPositionOnScreen + IClickableMenu.borderWidth + 4, base.yPositionOnScreen + IClickableMenu.borderWidth + spriteSize / 2, 260, spriteSize), null, "", item.Value.Npc.Sprite.Texture, item.Value.Npc.getMugShotSourceRect(), 4f));
                 this.characterSlots.Add(new ClickableTextureComponent(new Rectangle(base.xPositionOnScreen + IClickableMenu.borderWidth, 0, base.width - IClickableMenu.borderWidth * 2, rowHeight), null, new Rectangle(0, 0, 0, 0), 4f)
                 {
                     myID = itemIndex,
@@ -198,7 +199,7 @@ namespace ScheduleViewer
             string newHoverText = "";
             foreach (var hoverTextOption in this.hoverTextOptions)
             {
-                if (hoverTextOption.Value != null && hoverTextOption.Value.Item1.Contains(x,y))
+                if (hoverTextOption.Value != null && hoverTextOption.Value.Item1.Contains(x, y))
                 {
                     newHoverText = hoverTextOption.Value.Item2;
                     break;
@@ -375,7 +376,7 @@ namespace ScheduleViewer
             this.sprites[i].draw(b);
 
             NPCSchedule schedule = schedules[i];
-            NPC npc = schedule.NPC;
+            NPC npc = schedule.Npc;
             string name = npc.getName();
 
             bool datable = npc.datable.Value;
@@ -388,45 +389,62 @@ namespace ScheduleViewer
 
             int x = this.sprites[i].bounds.Right + partitionSize;
             int y = this.sprites[i].bounds.Y - 4;
-            float yOffset = 0;
 
-            int activeEntryIndex = 0;
-            for (int j = 0; j < schedule.Entries.Count; j++)
+            if (!npc.ignoreScheduleToday)
             {
-                if (schedule.Entries[j].Time <= Game1.timeOfDay)
+                float yOffset = 0;
+                int activeEntryIndex = 0;
+                for (int j = 0; j < schedule.Entries.Count; j++)
                 {
-                    activeEntryIndex = j;
-                }
-            }
-            Dictionary<int, ScheduleEntry> lines = new();
-            int line1Index = activeEntryIndex == 0 ? activeEntryIndex : activeEntryIndex - 1;
-            lines.Add(line1Index, schedule.Entries.ElementAtOrDefault(line1Index));
-            lines.Add(line1Index + 1, schedule.Entries.ElementAtOrDefault(line1Index + 1));
-            lines.Add(line1Index + 2, schedule.Entries.ElementAtOrDefault(line1Index + 2));
-            foreach (var line in lines)
-            {
-                string entryString = line.Value?.ToString();
-                string key = $"{i - this.slotPosition}-{line.Key - line1Index}";
-                if (string.IsNullOrEmpty(entryString))
-                {
-                    this.hoverTextOptions[key] = null;
-                } else
-                {
-                    this.hoverTextOptions[key] = Tuple.Create(new Rectangle(x, y + (int)yOffset, (int)Game1.smallFont.MeasureString(entryString).X + 2, (int)lineHeight), line.Value.GetHoverText());
-                }
-
-                if (line.Value != null)
-                {
-                    if (line.Key == activeEntryIndex)
+                    if (schedule.Entries[j].Time <= Game1.timeOfDay)
                     {
-                        Utility.drawBoldText(b, entryString, Game1.smallFont, new Vector2(x, y + yOffset), Game1.textColor);
+                        activeEntryIndex = j;
+                    }
+                }
+
+                Dictionary<int, ScheduleEntry> lines = new();
+                int line1Index = activeEntryIndex == 0 ? activeEntryIndex : activeEntryIndex - 1;
+                lines.Add(line1Index, schedule.Entries.ElementAtOrDefault(line1Index));
+                lines.Add(line1Index + 1, schedule.Entries.ElementAtOrDefault(line1Index + 1));
+                lines.Add(line1Index + 2, schedule.Entries.ElementAtOrDefault(line1Index + 2));
+                foreach (var line in lines)
+                {
+                    string entryString = line.Value?.ToString();
+                    string key = $"{i - this.slotPosition}-{line.Key - line1Index}";
+                    if (string.IsNullOrEmpty(entryString))
+                    {
+                        this.hoverTextOptions[key] = null;
                     }
                     else
                     {
-                        b.DrawString(Game1.smallFont, entryString, new Vector2(x, y + yOffset), Game1.textColor);
+                        this.hoverTextOptions[key] = Tuple.Create(new Rectangle(x, y + (int)yOffset, (int)Game1.smallFont.MeasureString(entryString).X + 2, (int)lineHeight), line.Value.GetHoverText());
                     }
-                    yOffset += lineHeight;
+
+                    if (line.Value != null)
+                    {
+                        if (line.Key == activeEntryIndex)
+                        {
+                            Utility.drawBoldText(b, entryString, Game1.smallFont, new Vector2(x, y + yOffset), Game1.textColor);
+                        }
+                        else
+                        {
+                            b.DrawString(Game1.smallFont, entryString, new Vector2(x, y + yOffset), Game1.textColor);
+                        }
+                        yOffset += lineHeight;
+                    }
                 }
+            }
+            else
+            {
+                string location = npc.currentLocation.IsFarm && npc.currentLocation.isStructure.Value ?
+                    $"{Schedule.PrettyPrintLocationName("Farm")} - {npc.currentLocation.Name}" :
+                    Schedule.PrettyPrintLocationName(npc.currentLocation.Name);
+                b.DrawString(Game1.smallFont, ModEntry.ModHelper.Translation.Get("ignoring_schedule_today"), new Vector2(x, y), Game1.textColor);
+                Utility.drawBoldText(b, location, Game1.smallFont, new Vector2(x, y + lineHeight), Game1.textColor);
+                // clear hover text options
+                this.hoverTextOptions[$"{i - this.slotPosition}-0"] = null;
+                this.hoverTextOptions[$"{i - this.slotPosition}-1"] = null;
+                this.hoverTextOptions[$"{i - this.slotPosition}-2"] = null;
             }
 
 
