@@ -30,7 +30,7 @@ namespace ScheduleViewer
         /// <summary>Index of the NPC that's at the top of the menu</summary>
         private int slotPosition;
 
-        private readonly List<ClickableTextureComponent> characterSlots = new();
+        public readonly List<ClickableTextureComponent> characterSlots = new();
 
         private readonly List<NPCSchedule> schedules = new();
 
@@ -74,7 +74,7 @@ namespace ScheduleViewer
                 {
                     myID = itemIndex,
                     downNeighborID = itemIndex + 1,
-                    upNeighborID = itemIndex - 1 < 0 ? 12342 : itemIndex - 1,
+                    upNeighborID = itemIndex - 1,
                 });
                 itemIndex++;
             }
