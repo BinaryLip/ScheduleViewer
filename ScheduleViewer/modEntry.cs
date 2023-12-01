@@ -21,6 +21,12 @@ namespace ScheduleViewer
         public static IModHelper ModHelper;
         public static Dictionary<string, string> CustomLocationNames = new();
         public static readonly string[] SortOrderOptions = new string[4];
+        /// <summary>Current player's mods don't match host's. Null if host doesn't have SMAPI.</summary>
+        public static bool? HasMismatchedMods = false;
+        /// <summary>Current player's GameVersion doesn't match host's.</summary>
+        public static bool HasMismatchedGameVersion = false;
+        /// <summary>Host player has this mod. Null if host has a different version.</summary>
+        public static bool? HostHasThisMod = true;
 
 
         /*********
@@ -52,6 +58,33 @@ namespace ScheduleViewer
         /// <inheritdoc cref="IGameLoopEvents.SaveLoaded"/>
         private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
         {
+            // check for mismatched GameVersion and Mods between host and current player
+            bool foundHost = !this.Helper.Multiplayer.GetConnectedPlayers().Any();
+            foreach (IMultiplayerPeer peer in this.Helper.Multiplayer.GetConnectedPlayers())
+            {
+                if (peer.IsHost)
+                {
+                    foundHost = true;
+                    if (!peer.HasSmapi)
+                    {
+                        ModEntry.HasMismatchedMods = null;
+                    } else
+                    {
+                        string modID = this.Helper.ModRegistry.ModID;
+                        ModEntry.HasMismatchedGameVersion = peer.GameVersion.ToString() != Game1.version;
+                        ModEntry.HasMismatchedMods = peer.Mods.Any(mod => !this.Helper.ModRegistry.IsLoaded(mod.ID));
+                        IMultiplayerPeerMod hostScheduleViewer = peer.GetMod(modID);
+                        if (hostScheduleViewer != null)
+                        {
+                            ModEntry.HostHasThisMod = hostScheduleViewer.Version.Equals(this.Helper.ModRegistry.Get(modID).Manifest.Version) ? true : null;
+                        } else
+                        {
+                            ModEntry.HostHasThisMod = false;
+                        }
+                    }
+                    break;
+                }
+            }
             // try loading in display names from NPC Map Locations
             try
             {
@@ -123,7 +156,7 @@ namespace ScheduleViewer
                     {
                         if (Context.IsPlayerFree && !Game1.player.UsingTool && !Game1.player.isEating)
                         {
-                            Game1.activeClickableMenu = new SchedulePage();
+                            Game1.activeClickableMenu = new SchedulesPage();
                         }  
                     }
                     // open from GameMenu if it's safe to close the GameMenu
@@ -131,7 +164,7 @@ namespace ScheduleViewer
                     {
                         if (Game1.activeClickableMenu.readyToClose())
                         {
-                            Game1.activeClickableMenu = new SchedulePage();
+                            Game1.activeClickableMenu = new SchedulesPage();
                         }
                     }
                 }
