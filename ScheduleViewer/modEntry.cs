@@ -114,12 +114,21 @@ namespace ScheduleViewer
             );
 
             // add some config options
+            configMenu.AddSectionTitle(ModManifest, () => this.Helper.Translation.Get("config.option.general.title"));
             configMenu.AddKeybind(
                 ModManifest,
                 name: () => this.Helper.Translation.Get("config.option.show_schedule_key.name"),
                 getValue: () => Config.ShowSchedulesKey,
                 setValue: value => Config.ShowSchedulesKey = value
             );
+            configMenu.AddBoolOption(
+                ModManifest,
+                name: () => this.Helper.Translation.Get("config.option.disable_hover.name"),
+                tooltip: () => this.Helper.Translation.Get("config.option.disable_hover.description"),
+                getValue: () => Config.DisableHover,
+                setValue: value => Config.DisableHover = value
+            );
+            configMenu.AddSectionTitle(ModManifest, () => this.Helper.Translation.Get("config.option.filter_sort.title"));
             configMenu.AddTextOption(
                 ModManifest,
                 name: () => this.Helper.Translation.Get("config.option.sort_options.name"),

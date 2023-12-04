@@ -205,16 +205,19 @@ namespace ScheduleViewer
             base.performHoverAction(x, y);
             this.upButton.tryHover(x, y);
             this.downButton.tryHover(x, y);
-            string newHoverText = "";
-            foreach (var hoverTextOption in this.hoverTextOptions)
+            if (!ModEntry.Config.DisableHover)
             {
-                if (hoverTextOption.Value != null && hoverTextOption.Value.Item1.Contains(x, y))
+                string newHoverText = "";
+                foreach (var hoverTextOption in this.hoverTextOptions)
                 {
-                    newHoverText = hoverTextOption.Value.Item2;
-                    break;
+                    if (hoverTextOption.Value != null && hoverTextOption.Value.Item1.Contains(x, y))
+                    {
+                        newHoverText = hoverTextOption.Value.Item2;
+                        break;
+                    }
                 }
+                this.hoverText = newHoverText;
             }
-            this.hoverText = newHoverText;
         }
 
         public override void receiveLeftClick(int x, int y, bool playSound = true)
