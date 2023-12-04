@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace ScheduleViewer
 {
-    public class SchedulePage : IClickableMenu
+    public class SchedulesPage : IClickableMenu
     {
         public const int spriteSize = 64, partitionSize = 8, rowHeight = 112, slotsOnPage = 5;
 
@@ -32,44 +32,53 @@ namespace ScheduleViewer
 
         public readonly List<ClickableTextureComponent> characterSlots = new();
 
-        private readonly List<NPCSchedule> schedules = new();
+        private readonly List<Schedule.NPCSchedule> schedules = new();
 
         private readonly List<ClickableTextureComponent> sprites = new();
+
+        private readonly Texture2D emptySprite = ModEntry.ModHelper.ModContent.Load<Texture2D>("assets/Unknown.png");
 
         public Friendship emptyFriendship = new();
 
 
-        public SchedulePage(int initialSlotPosition = 0)
+        public SchedulesPage(int initialSlotPosition = 0)
             : base(Game1.uiViewport.Width / 2 - (800 + IClickableMenu.borderWidth * 2) / 2, Game1.uiViewport.Height / 2 - (600 + IClickableMenu.borderWidth * 2) / 2, 800 + 36 + IClickableMenu.borderWidth * 2, 600 + IClickableMenu.borderWidth * 2, showUpperRightCloseButton: true)
         {
             this.slotPosition = initialSlotPosition;
             // filter npcs
-            IEnumerable<KeyValuePair<string, NPCSchedule>> filteredSchedules = Schedule.GetSchedules(ModEntry.Config.OnlyShowSocializableNPCs, ModEntry.Config.OnlyShowMetNPCs);
+            IEnumerable<KeyValuePair<string, Schedule.NPCSchedule>> filteredSchedules = Schedule.GetSchedules(ModEntry.Config.OnlyShowSocializableNPCs, ModEntry.Config.OnlyShowMetNPCs);
             // sort npcs
             if (ModEntry.Config.SortOrder == ModEntry.SortOrderOptions[1])
             {
-                filteredSchedules = filteredSchedules.OrderByDescending(x => x.Key);
+                filteredSchedules = filteredSchedules.OrderByDescending(x => x.Value.DisplayName);
             }
             else if (ModEntry.Config.SortOrder == ModEntry.SortOrderOptions[2])
-            {
-                filteredSchedules = filteredSchedules.OrderBy(x => Game1.player.getFriendshipLevelForNPC(x.Key)).ThenBy(x => x.Key);
+            {      
+                filteredSchedules = filteredSchedules.OrderBy(x => Game1.player.getFriendshipLevelForNPC(x.Key)).ThenBy(x => x.Value.DisplayName);
             }
             else if (ModEntry.Config.SortOrder == ModEntry.SortOrderOptions[3])
             {
-                filteredSchedules = filteredSchedules.OrderByDescending(x => Game1.player.getFriendshipLevelForNPC(x.Key)).ThenBy(x => x.Key);
+                filteredSchedules = filteredSchedules.OrderByDescending(x => Game1.player.getFriendshipLevelForNPC(x.Key)).ThenBy(x => x.Value.DisplayName);
             }
             else
             {
-                filteredSchedules = filteredSchedules.OrderBy(x => x.Key);
+                filteredSchedules = filteredSchedules.OrderBy(x => x.Value.DisplayName);
             }
 
             // map schedules into slots
             int itemIndex = 0;
             foreach (var item in filteredSchedules)
             {
-                var f = GetFriendship(item.Key);
+                // if not host then need to get sprite info
+                if (item.Value.SpriteTexture == null || item.Value.SourceRect == null)
+                {
+                    NPC npc = Game1.getCharacterFromName(item.Key);
+                    item.Value.SpriteTexture = npc?.Sprite.Texture ?? emptySprite;
+                    item.Value.SourceRect = npc?.getMugShotSourceRect() ?? new Rectangle(0, 0, 16, 24);
+                }
+
                 this.schedules.Add(item.Value);
-                this.sprites.Add(new ClickableTextureComponent("", new Rectangle(base.xPositionOnScreen + IClickableMenu.borderWidth + 4, base.yPositionOnScreen + IClickableMenu.borderWidth + spriteSize / 2, 260, spriteSize), null, "", item.Value.Npc.Sprite.Texture, item.Value.Npc.getMugShotSourceRect(), 4f));
+                this.sprites.Add(new ClickableTextureComponent("", new Rectangle(base.xPositionOnScreen + IClickableMenu.borderWidth + 4, base.yPositionOnScreen + IClickableMenu.borderWidth + spriteSize / 2, 260, spriteSize), null, "", item.Value.SpriteTexture, (Rectangle)item.Value.SourceRect, 4f));
                 this.characterSlots.Add(new ClickableTextureComponent(new Rectangle(base.xPositionOnScreen + IClickableMenu.borderWidth, 0, base.width - IClickableMenu.borderWidth * 2, rowHeight), null, new Rectangle(0, 0, 0, 0), 4f)
                 {
                     myID = itemIndex,
@@ -171,7 +180,7 @@ namespace ScheduleViewer
         public override void gameWindowSizeChanged(Rectangle oldBounds, Rectangle newBounds)
         {
             base.gameWindowSizeChanged(oldBounds, newBounds);
-            Game1.activeClickableMenu = new SchedulePage(this.slotPosition);
+            Game1.activeClickableMenu = new SchedulesPage(this.slotPosition);
         }
 
         public override void leftClickHeld(int x, int y)
@@ -375,38 +384,32 @@ namespace ScheduleViewer
             }
             this.sprites[i].draw(b);
 
-            NPCSchedule schedule = schedules[i];
-            NPC npc = schedule.Npc;
-            string name = npc.getName();
+            var (displayName, entries, currentLocation) = schedules[i];
 
-            bool datable = npc.datable.Value;
-            Friendship friendship = this.GetFriendship(name);
-            bool spouse = friendship.IsMarried();
-            bool housemate = spouse && npc.isRoommate();
             float lineHeight = Game1.smallFont.MeasureString("W").Y;
             float russianOffsetY = ((LocalizedContentManager.CurrentLanguageCode == LocalizedContentManager.LanguageCode.ru || LocalizedContentManager.CurrentLanguageCode == LocalizedContentManager.LanguageCode.ko) ? ((0f - lineHeight) / 2f) : 0f);
-            b.DrawString(Game1.dialogueFont, name, new Vector2((float)(base.xPositionOnScreen + IClickableMenu.borderWidth * 3 / 2 + 64 - 20 + 96) - Game1.dialogueFont.MeasureString(name).X / 2f, (float)(this.sprites[i].bounds.Y + 48) + russianOffsetY - (float)(datable ? 24 : 20)), Game1.textColor);
+            b.DrawString(Game1.dialogueFont, displayName, new Vector2((float)(base.xPositionOnScreen + IClickableMenu.borderWidth * 3 / 2 + 64 - 20 + 96) - Game1.dialogueFont.MeasureString(displayName).X / 2f, (float)(this.sprites[i].bounds.Y + 48) + russianOffsetY - 20), Game1.textColor);
 
             int x = this.sprites[i].bounds.Right + partitionSize;
             int y = this.sprites[i].bounds.Y - 4;
 
-            if (!npc.ignoreScheduleToday)
+            if (currentLocation == null)
             {
                 float yOffset = 0;
                 int activeEntryIndex = 0;
-                for (int j = 0; j < schedule.Entries.Count; j++)
+                for (int j = 0; j < entries.Count; j++)
                 {
-                    if (schedule.Entries[j].Time <= Game1.timeOfDay)
+                    if (entries[j].Time <= Game1.timeOfDay)
                     {
                         activeEntryIndex = j;
                     }
                 }
 
-                Dictionary<int, ScheduleEntry> lines = new();
+                Dictionary<int, Schedule.ScheduleEntry> lines = new();
                 int line1Index = activeEntryIndex == 0 ? activeEntryIndex : activeEntryIndex - 1;
-                lines.Add(line1Index, schedule.Entries.ElementAtOrDefault(line1Index));
-                lines.Add(line1Index + 1, schedule.Entries.ElementAtOrDefault(line1Index + 1));
-                lines.Add(line1Index + 2, schedule.Entries.ElementAtOrDefault(line1Index + 2));
+                lines.Add(line1Index, entries.ElementAtOrDefault(line1Index));
+                lines.Add(line1Index + 1, entries.ElementAtOrDefault(line1Index + 1));
+                lines.Add(line1Index + 2, entries.ElementAtOrDefault(line1Index + 2));
                 foreach (var line in lines)
                 {
                     string entryString = line.Value?.ToString();
@@ -436,65 +439,13 @@ namespace ScheduleViewer
             }
             else
             {
-                string location = npc.currentLocation.IsFarm && npc.currentLocation.isStructure.Value ?
-                    $"{Schedule.PrettyPrintLocationName("Farm")} - {npc.currentLocation.Name}" :
-                    Schedule.PrettyPrintLocationName(npc.currentLocation.Name);
                 b.DrawString(Game1.smallFont, ModEntry.ModHelper.Translation.Get("ignoring_schedule_today"), new Vector2(x, y), Game1.textColor);
-                Utility.drawBoldText(b, location, Game1.smallFont, new Vector2(x, y + lineHeight), Game1.textColor);
+                Utility.drawBoldText(b, currentLocation, Game1.smallFont, new Vector2(x, y + lineHeight), Game1.textColor);
                 // clear hover text options
                 this.hoverTextOptions[$"{i - this.slotPosition}-0"] = null;
                 this.hoverTextOptions[$"{i - this.slotPosition}-1"] = null;
                 this.hoverTextOptions[$"{i - this.slotPosition}-2"] = null;
             }
-
-
-            if (datable || housemate)
-            {
-                var isMale = npc.Gender == 0;
-                string text = ((!Game1.content.ShouldUseGenderedCharacterTranslations()) ? Game1.content.LoadString("Strings\\StringsFromCSFiles:SocialPage.cs.11635") : (isMale ? Game1.content.LoadString("Strings\\StringsFromCSFiles:SocialPage.cs.11635").Split('/').First() : Game1.content.LoadString("Strings\\StringsFromCSFiles:SocialPage.cs.11635").Split('/').Last()));
-                if (housemate)
-                {
-                    text = Game1.content.LoadString("Strings\\StringsFromCSFiles:Housemate");
-                }
-                else if (spouse)
-                {
-                    text = (isMale ? Game1.content.LoadString("Strings\\StringsFromCSFiles:SocialPage.cs.11636") : Game1.content.LoadString("Strings\\StringsFromCSFiles:SocialPage.cs.11637"));
-                }
-                else if (!Game1.player.isMarried() && friendship.IsDating())
-                {
-                    text = (isMale ? Game1.content.LoadString("Strings\\StringsFromCSFiles:SocialPage.cs.11639") : Game1.content.LoadString("Strings\\StringsFromCSFiles:SocialPage.cs.11640"));
-                }
-                else if (friendship.IsDivorced())
-                {
-                    text = (isMale ? Game1.content.LoadString("Strings\\StringsFromCSFiles:SocialPage.cs.11642") : Game1.content.LoadString("Strings\\StringsFromCSFiles:SocialPage.cs.11643"));
-                }
-                int width = (IClickableMenu.borderWidth * 3 + 128 - 40 + 192) / 2;
-                text = Game1.parseText(text, Game1.smallFont, width);
-                Vector2 textSize = Game1.smallFont.MeasureString(text);
-                b.DrawString(Game1.smallFont, text, new Vector2((float)(base.xPositionOnScreen + 192 + 8) - textSize.X / 2f, (float)this.sprites[i].bounds.Bottom - (textSize.Y - lineHeight)), Game1.textColor);
-            }
-
-            if (spouse)
-            {
-                if (!housemate || name == "Krobus")
-                {
-                    b.Draw(Game1.objectSpriteSheet, new Vector2(base.xPositionOnScreen + IClickableMenu.borderWidth * 7 / 4 + 192, this.sprites[i].bounds.Y), Game1.getSourceRectForStandardTileSheet(Game1.objectSpriteSheet, housemate ? 808 : 460, 16, 16), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0.88f);
-                }
-            }
-            // bouquet icon
-            else if (friendship.IsDating())
-            {
-                b.Draw(Game1.objectSpriteSheet, new Vector2(base.xPositionOnScreen + IClickableMenu.borderWidth * 7 / 4 + 192, this.sprites[i].bounds.Y), Game1.getSourceRectForStandardTileSheet(Game1.objectSpriteSheet, housemate ? 808 : 458, 16, 16), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0.88f);
-            }
-        }
-
-        private Friendship GetFriendship(string name)
-        {
-            if (Game1.player.friendshipData.ContainsKey(name))
-            {
-                return Game1.player.friendshipData[name];
-            }
-            return this.emptyFriendship;
         }
 
         private int RowPosition(int i)

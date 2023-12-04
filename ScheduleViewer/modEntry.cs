@@ -21,13 +21,10 @@ namespace ScheduleViewer
         public static IModHelper ModHelper;
         public static Dictionary<string, string> CustomLocationNames = new();
         public static readonly string[] SortOrderOptions = new string[4];
-        /// <summary>Current player's mods don't match host's. Null if host doesn't have SMAPI.</summary>
-        public static bool? HasMismatchedMods = false;
-        /// <summary>Current player's GameVersion doesn't match host's.</summary>
-        public static bool HasMismatchedGameVersion = false;
-        /// <summary>Host player has this mod. Null if host has a different version.</summary>
-        public static bool? HostHasThisMod = true;
+        private static DialogueBox ErrorDialogue = null;
 
+        public const string ModMessageSchedule = "the day's schedule";
+        public const string ModMessageCurrentLocation = "NPC current location update";
 
         /*********
         ** Public methods
@@ -49,6 +46,10 @@ namespace ScheduleViewer
             {
                 helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
             }
+            helper.Events.Multiplayer.PeerConnected += OnPeerConnected;
+            helper.Events.Multiplayer.ModMessageReceived += OnModMessageReceived;
+            helper.Events.World.NpcListChanged += OnNpcListChanged;
+            helper.Events.Display.MenuChanged += OnMenuChanged;
         }
 
 
@@ -59,28 +60,27 @@ namespace ScheduleViewer
         private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
         {
             // check for mismatched GameVersion and Mods between host and current player
-            bool foundHost = !this.Helper.Multiplayer.GetConnectedPlayers().Any();
             foreach (IMultiplayerPeer peer in this.Helper.Multiplayer.GetConnectedPlayers())
             {
                 if (peer.IsHost)
                 {
-                    foundHost = true;
-                    if (!peer.HasSmapi)
+                    List<string> errors = new();
+                    var modDiffs = peer.Mods?.Where(mod => !mod.Version.Equals(this.Helper.ModRegistry.Get(mod.ID)?.Manifest.Version)).Select(mod => new {mod.Name, HostVersion = mod.Version.ToString(), PlayerVersion = this.Helper.ModRegistry.Get(mod.ID)?.Manifest.Version.ToString()});
+                    if (peer.HasSmapi && peer.GameVersion.ToString() != Game1.version)
                     {
-                        ModEntry.HasMismatchedMods = null;
-                    } else
+                        errors.Add(this.Helper.Translation.Get("error.mismatch_game_version"));
+                    }
+                    if (!peer.HasSmapi || modDiffs.Any())
                     {
-                        string modID = this.Helper.ModRegistry.ModID;
-                        ModEntry.HasMismatchedGameVersion = peer.GameVersion.ToString() != Game1.version;
-                        ModEntry.HasMismatchedMods = peer.Mods.Any(mod => !this.Helper.ModRegistry.IsLoaded(mod.ID));
-                        IMultiplayerPeerMod hostScheduleViewer = peer.GetMod(modID);
-                        if (hostScheduleViewer != null)
+                        errors.Add(this.Helper.Translation.Get("error.mismatch_mods"));
+                        foreach (var diff in modDiffs)
                         {
-                            ModEntry.HostHasThisMod = hostScheduleViewer.Version.Equals(this.Helper.ModRegistry.Get(modID).Manifest.Version) ? true : null;
-                        } else
-                        {
-                            ModEntry.HostHasThisMod = false;
+                            Console.LogOnce($"Warning! Found mismatched mod: \"{diff.Name}\". Host version: {diff.HostVersion} Your vesion: {diff.PlayerVersion}", LogLevel.Warn);
                         }
+                    }
+                    if (errors.Any())
+                    {
+                        ErrorDialogue = new DialogueBox(string.Join("^", errors));
                     }
                     break;
                 }
@@ -92,6 +92,11 @@ namespace ScheduleViewer
                 CustomLocationNames = locationSettings.Where(location => location.Value.SelectToken("MapTooltip.PrimaryText") != null).ToDictionary(location => location.Key, location => location.Value.SelectToken("MapTooltip.PrimaryText").Value<string>());
             }
             catch (Exception) { }
+            // broadcast the new day's schedule if multiplayer
+            if (Game1.IsMasterGame && this.Helper.Multiplayer.GetConnectedPlayers().Any())
+            {
+                Schedule.SendSchedules();
+            }
         }
 
         /// <inheritdoc cref="IGameLoopEvents.GameLaunched"/>
@@ -156,22 +161,95 @@ namespace ScheduleViewer
                     {
                         if (Context.IsPlayerFree && !Game1.player.UsingTool && !Game1.player.isEating)
                         {
-                            Game1.activeClickableMenu = new SchedulesPage();
-                        }  
+                            OpenMenu();
+                        }
                     }
                     // open from GameMenu if it's safe to close the GameMenu
                     else if (Game1.activeClickableMenu is GameMenu)
                     {
                         if (Game1.activeClickableMenu.readyToClose())
                         {
-                            Game1.activeClickableMenu = new SchedulesPage();
+                            OpenMenu();
                         }
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Console.Log("Error handling key input.", LogLevel.Error);
+                Console.Log(ex.ToString(), LogLevel.Error);
+                Console.Log("Error opening the Schedule Viewer.", LogLevel.Error);
+            }
+        }
+
+        /// <inheritdoc cref="IMultiplayerEvents.PeerConnected"/>
+        private void OnPeerConnected(object sender, PeerConnectedEventArgs e)
+        {
+            // broadcast the schedule
+            if (Game1.IsMasterGame)
+            {
+                Schedule.SendSchedules();
+            }
+        }
+
+        /// <inheritdoc cref="IMultiplayerEvents.ModMessageReceived"/>
+        private void OnModMessageReceived(object sender, ModMessageReceivedEventArgs e)
+        {
+            if (e.FromModID == this.ModManifest.UniqueID)
+            {
+                Console.Log($"Received {e.Type} from host.", LogLevel.Trace);
+                switch (e.Type)
+                {
+                    case ModMessageSchedule:
+                        Schedule.ReceiveSchedules(e.ReadAs<(int, Dictionary<string, Schedule.NPCSchedule>)>());
+                        break;
+                    case ModMessageCurrentLocation:
+                        Schedule.UpdateCurrentLocation(e.ReadAs<(string, string)>());
+                        break;
+                }
+            }
+        }
+
+        /// <inheritdoc cref="IWorldEvents.NpcListChanged"/>
+        private void OnNpcListChanged(object sender, NpcListChangedEventArgs e)
+        {
+            // update current location for NPCs that are ignoring theit schedule
+            if (Game1.IsMasterGame)
+            {
+                var npcsToUpdate = Schedule.GetSchedules().Where(schedule => e.Added.Any(npc => npc.Name.Equals(schedule.Key) && schedule.Value.CurrentLocation != null));
+                if (npcsToUpdate.Any())
+                {
+                    string newLocation = Schedule.PrettyPrintLocationName(e.Location);
+                    foreach (var npc in npcsToUpdate)
+                    {
+                        Schedule.UpdateCurrentLocation((npc.Key, newLocation));
+                        this.Helper.Multiplayer.SendMessage<(string, string)>((npc.Key, newLocation), ModMessageCurrentLocation);
+                    }
+                }
+            }
+        }
+
+        /// <inheritdoc cref="IDisplayEvents.MenuChanged"/>
+        private void OnMenuChanged(object sender, MenuChangedEventArgs e)
+        {
+            if (ErrorDialogue != null && e.OldMenu == ErrorDialogue)
+            {
+                Game1.activeClickableMenu = new SchedulesPage();
+            }
+            if (e.NewMenu is SchedulesPage)
+            {
+                ErrorDialogue = null;
+            }
+        }
+
+        private static void OpenMenu()
+        {
+            if (ErrorDialogue != null)
+            {
+                Game1.activeClickableMenu = ErrorDialogue;
+            }
+            else
+            {
+                Game1.activeClickableMenu = new SchedulesPage();
             }
         }
     }
