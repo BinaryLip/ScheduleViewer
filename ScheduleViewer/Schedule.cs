@@ -129,22 +129,28 @@ namespace ScheduleViewer
             NpcsWithSchedule = new();
             foreach (var npc in npcs)
             {
+                string name = npc.getName();
+                string dayScheduleName = string.Empty;
                 try
                 {
                     Dictionary<string, string> rawMasterSchedule = npc.getMasterScheduleRawData();
-                    string dayScheduleName = npc.dayScheduleName.Value ?? ModEntry.ModHelper.Reflection.GetField<string>(npc, "_lastLoadedScheduleKey").GetValue();
+                    dayScheduleName = npc.dayScheduleName.Value ?? ModEntry.ModHelper.Reflection.GetField<string>(npc, "_lastLoadedScheduleKey").GetValue();
                     string rawSchedule = rawMasterSchedule[dayScheduleName];
 
                     List<ScheduleEntry> scheduleEntries = ParseMasterSchedule(rawSchedule, npc);
-                    NpcsWithSchedule.Add(npc.Name, new NPCSchedule(npc.getName(), scheduleEntries, npc.CanSocialize, npc.ignoreScheduleToday ? PrettyPrintLocationName(npc.currentLocation) : null, npc.Sprite.Texture, npc.getMugShotSourceRect()));
+                    NpcsWithSchedule.Add(npc.Name, new NPCSchedule(name, scheduleEntries, npc.CanSocialize, npc.ignoreScheduleToday ? PrettyPrintLocationName(npc.currentLocation) : null, npc.Sprite.Texture, npc.getMugShotSourceRect()));
                 }
                 catch (ArgumentNullException)
                 {
-                    ModEntry.Console.Log($"Warning! Couldn't find a schedule for \"{npc.getName()}\". Does the host not have Schedule Viewer installed?", LogLevel.Warn);
+                    ModEntry.Console.Log($"Warning! Couldn't find a schedule for {name}. Does the host not have Schedule Viewer installed?", LogLevel.Warn);
                 }
                 catch (ArgumentException)
                 {
-                    ModEntry.Console.Log($"Warning! Found an NPC whose name is already in the list. This means you have 2 or more NPCs with the same name. The schedule for \"{npc.getName()}\" might not be accurate.", LogLevel.Warn);
+                    ModEntry.Console.Log($"Warning! Found an NPC whose name is already in the list. This means you have 2 or more NPCs with the same name. The schedule for {name} might not be accurate.", LogLevel.Warn);
+                }
+                catch (KeyNotFoundException)
+                {
+                    ModEntry.Console.Log($"Warning! Couldn't find the schedule called \"{dayScheduleName}\" for {name}. One of your other mods must be messing with {name}'s schedule.", LogLevel.Warn);
                 }
             }
 
