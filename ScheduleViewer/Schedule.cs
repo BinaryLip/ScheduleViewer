@@ -121,7 +121,7 @@ namespace ScheduleViewer
             List<NPC> npcs = new();
             foreach (var npc in Utility.getAllCharacters())
             {
-                if (npc.Schedule != null)
+                if (npc.Schedule != null && npc.Schedule.Any())
                 {
                     npcs.Add(npc);
                 }
