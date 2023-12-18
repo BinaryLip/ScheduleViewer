@@ -37,15 +37,12 @@ namespace ScheduleViewer
             ModHelper = helper;
             for (int i = 0; i < SortOrderOptions.Length; i++)
             {
-                SortOrderOptions[i] = this.Helper.Translation.Get($"config.option.sort_options.option_{i}");
+                SortOrderOptions[i] = helper.Translation.Get($"config.option.sort_options.option_{i}");
             }
             Config = helper.ReadConfig<ModConfig>();
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
             helper.Events.Input.ButtonsChanged += OnButtonsChanged;
-            if (helper.ModRegistry.IsLoaded("Bouhm.NPCMapLocations"))
-            {
-                helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
-            }
+            helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
             helper.Events.Multiplayer.PeerConnected += OnPeerConnected;
             helper.Events.Multiplayer.ModMessageReceived += OnModMessageReceived;
             helper.Events.World.NpcListChanged += OnNpcListChanged;
@@ -65,7 +62,7 @@ namespace ScheduleViewer
                 if (peer.IsHost)
                 {
                     List<string> errors = new();
-                    var modDiffs = peer.Mods?.Where(mod => !mod.Version.Equals(this.Helper.ModRegistry.Get(mod.ID)?.Manifest.Version)).Select(mod => new {mod.Name, HostVersion = mod.Version.ToString(), PlayerVersion = this.Helper.ModRegistry.Get(mod.ID)?.Manifest.Version.ToString()});
+                    var modDiffs = peer.Mods?.Where(mod => !mod.Version.Equals(this.Helper.ModRegistry.Get(mod.ID)?.Manifest.Version)).Select(mod => new { mod.Name, HostVersion = mod.Version.ToString(), PlayerVersion = this.Helper.ModRegistry.Get(mod.ID)?.Manifest.Version.ToString() });
                     if (peer.HasSmapi && peer.GameVersion.ToString() != Game1.version)
                     {
                         errors.Add(this.Helper.Translation.Get("error.mismatch_game_version"));
@@ -86,12 +83,16 @@ namespace ScheduleViewer
                 }
             }
             // try loading in display names from NPC Map Locations
-            try
+            if (this.Helper.ModRegistry.IsLoaded("Bouhm.NPCMapLocations"))
             {
-                var locationSettings = this.Helper.GameContent.Load<Dictionary<string, JObject>>("Mods/Bouhm.NPCMapLocations/Locations");
-                CustomLocationNames = locationSettings.Where(location => location.Value.SelectToken("MapTooltip.PrimaryText") != null).ToDictionary(location => location.Key, location => location.Value.SelectToken("MapTooltip.PrimaryText").Value<string>());
+                try
+                {
+                    var locationSettings = this.Helper.GameContent.Load<Dictionary<string, JObject>>("Mods/Bouhm.NPCMapLocations/Locations");
+                    CustomLocationNames = locationSettings.Where(location => location.Value.SelectToken("MapTooltip.PrimaryText") != null).ToDictionary(location => location.Key, location => location.Value.SelectToken("MapTooltip.PrimaryText").Value<string>());
+                }
+                catch (Exception) { }
             }
-            catch (Exception) { }
+
             // broadcast the new day's schedule if multiplayer
             if (Game1.IsMasterGame && this.Helper.Multiplayer.GetConnectedPlayers().Any())
             {
