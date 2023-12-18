@@ -442,7 +442,7 @@ namespace ScheduleViewer
             }
             else
             {
-                b.DrawString(Game1.smallFont, ModEntry.ModHelper.Translation.Get("ignoring_schedule_today"), new Vector2(x, y), Game1.textColor);
+                b.DrawString(Game1.smallFont, ModEntry.ModHelper.Translation.Get(entries == null ? "not_following_schedule_today" : "ignoring_schedule_today"), new Vector2(x, y), Game1.textColor);
                 Utility.drawBoldText(b, currentLocation, Game1.smallFont, new Vector2(x, y + lineHeight), Game1.textColor);
                 // clear hover text options
                 this.hoverTextOptions[$"{i - this.slotPosition}-0"] = null;

@@ -51,8 +51,10 @@ namespace ScheduleViewer
         public class NPCSchedule
         {
             public string DisplayName { get; init; }
+            /// <summary>The schedule entries for today. If null, then the NPC is not following a schedule.</summary>
             public List<ScheduleEntry> Entries { get; init; }
             public bool CanSocialize { get; init; }
+            /// <summary>If not null, then the NPC is either not following a schedule or they are ignoring it today.</summary>
             public string CurrentLocation { get; set; }
             public Texture2D SpriteTexture { get; set; }
             public Rectangle? SourceRect { get; set; }
@@ -121,7 +123,7 @@ namespace ScheduleViewer
             List<NPC> npcs = new();
             foreach (var npc in Utility.getAllCharacters())
             {
-                if (npc.Schedule != null && npc.Schedule.Any())
+                if (!npc.followSchedule || (npc.Schedule != null && npc.Schedule.Any()))
                 {
                     npcs.Add(npc);
                 }
@@ -131,14 +133,18 @@ namespace ScheduleViewer
             {
                 string name = npc.getName();
                 string dayScheduleName = string.Empty;
+                List<ScheduleEntry> scheduleEntries = null;
                 try
                 {
-                    Dictionary<string, string> rawMasterSchedule = npc.getMasterScheduleRawData();
-                    dayScheduleName = npc.dayScheduleName.Value ?? ModEntry.ModHelper.Reflection.GetField<string>(npc, "_lastLoadedScheduleKey").GetValue();
-                    string rawSchedule = rawMasterSchedule[dayScheduleName];
+                    if (npc.followSchedule)
+                    {
+                        Dictionary<string, string> rawMasterSchedule = npc.getMasterScheduleRawData();
+                        dayScheduleName = npc.dayScheduleName.Value ?? ModEntry.ModHelper.Reflection.GetField<string>(npc, "_lastLoadedScheduleKey").GetValue();
+                        string rawSchedule = rawMasterSchedule[dayScheduleName];
 
-                    List<ScheduleEntry> scheduleEntries = ParseMasterSchedule(rawSchedule, npc);
-                    NpcsWithSchedule.Add(npc.Name, new NPCSchedule(name, scheduleEntries, npc.CanSocialize, npc.ignoreScheduleToday ? PrettyPrintLocationName(npc.currentLocation) : null, npc.Sprite.Texture, npc.getMugShotSourceRect()));
+                        scheduleEntries = ParseMasterSchedule(rawSchedule, npc);
+                    }
+                    NpcsWithSchedule.Add(npc.Name, new NPCSchedule(name, scheduleEntries, npc.CanSocialize, !npc.followSchedule || npc.ignoreScheduleToday ? PrettyPrintLocationName(npc.currentLocation) : null, npc.Sprite.Texture, npc.getMugShotSourceRect()));
                 }
                 catch (ArgumentNullException)
                 {
@@ -409,7 +415,7 @@ namespace ScheduleViewer
             {
                 ModEntry.Console.LogOnce($"Couldn't find a display name for location: {location}", LogLevel.Debug);
             }
-            return locationDisplayName ?? (location.StartsWith("Custom") ? SplitCamelCase(location.Substring(7)) : location);
+            return locationDisplayName ?? GetUnknownLocationName(location);
         }
 
         public static string PrettyPrintLocationName(GameLocation location) =>
@@ -430,10 +436,28 @@ namespace ScheduleViewer
             );
         }
 
+        public static string GetFarmName() => Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11064", Game1.player.IsLocalPlayer ? Game1.player.farmName.Value : "")?.Trim();
+
+        public static string GetUnknownLocationName(string location)
+        {
+            if (location.StartsWith("Custom"))
+            {
+                return SplitCamelCase(location.Substring(7));
+            }
+            if (location.Equals("FarmHouse"))
+            {
+                return $"{GetFarmName()} - Farmhouse";
+            }
+            if (location.StartsWith("Island"))
+            {
+                return $"{Game1.content.LoadString("Strings\\StringsFromCSFiles:IslandName")} - {SplitCamelCase(location.Substring(6))}";
+            }
+            return SplitCamelCase(location);
+        }
+
         public static Dictionary<string, string> GetLocationNames()
         {
             if (LocationNames?.Count > 0) return LocationNames;
-            string farmName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11064", Game1.player.IsLocalPlayer ? Game1.player.farmName.Value : "")?.Trim();
             LocationNames = new Dictionary<string, string>
             {
                 { "AdventureGuild", Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11099") },
@@ -450,7 +474,7 @@ namespace ScheduleViewer
                 { "CommunityCenter", Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11117") },
                 { "Desert", Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11062") },
                 { "ElliottHouse", Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11088") },
-                { "Farm", farmName },
+                { "Farm", GetFarmName() },
                 { "FishShop", Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11107") },
                 { "Forest", Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11186") },
                 { "HaleyHouse", Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11073") },
