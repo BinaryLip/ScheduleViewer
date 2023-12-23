@@ -56,17 +56,17 @@ namespace ScheduleViewer
             public bool CanSocialize { get; init; }
             /// <summary>If not null, then the NPC is either not following a schedule or they are ignoring it today.</summary>
             public string CurrentLocation { get; set; }
-            public Texture2D SpriteTexture { get; set; }
-            public Rectangle? SourceRect { get; set; }
+            public AnimatedSprite Sprite { get; set; }
+            public Rectangle? MugShotSourceRect { get; set; }
 
-            public NPCSchedule(string displayName, List<ScheduleEntry> entries, bool canSocialize, string currentLocation, Texture2D spriteTexture = null, Rectangle? sourceRect = null)
+            public NPCSchedule(string displayName, List<ScheduleEntry> entries, bool canSocialize, string currentLocation, AnimatedSprite sprite = null, Rectangle? mugShotSourceRect = null)
             {
                 DisplayName = displayName;
                 Entries = entries;
                 CanSocialize = canSocialize;
                 CurrentLocation = currentLocation;
-                SpriteTexture = spriteTexture;
-                SourceRect = sourceRect;
+                Sprite = sprite;
+                MugShotSourceRect = mugShotSourceRect;
             }
 
             public NPCSchedule GetSerializableObject()
@@ -82,20 +82,20 @@ namespace ScheduleViewer
             }
         }
 
-        public static void SendSchedules()
+        internal static void SendSchedules()
         {
             // clear sprite related fields and send
             ModEntry.ModHelper.Multiplayer.SendMessage((Game1.Date.TotalDays + 1, GetSchedules().ToDictionary(x => x.Key, x => x.Value.GetSerializableObject())), ModEntry.ModMessageSchedule);
         }
 
-        public static void ReceiveSchedules((int, Dictionary<string, NPCSchedule>) Message)
+        internal static void ReceiveSchedules((int, Dictionary<string, NPCSchedule>) Message)
         {
             HasHostSchedules = true;
             Date = SDate.FromDaysSinceStart(Message.Item1).ToWorldDate();
             NpcsWithSchedule = Message.Item2;
         }
 
-        public static void UpdateCurrentLocation((string, string) Message)
+        internal static void UpdateCurrentLocation((string, string) Message)
         {
             try
             {
@@ -107,6 +107,9 @@ namespace ScheduleViewer
             }
         }
 
+        public static bool HasSchedules() => Game1.Date == Date && NpcsWithSchedule != null;
+
+
         /// <summary>
         /// Get, parse, and filter NPCs with a schedule. 
         /// </summary>
@@ -115,7 +118,7 @@ namespace ScheduleViewer
         /// <returns></returns>
         public static IEnumerable<KeyValuePair<string, NPCSchedule>> GetSchedules(bool onlyShowSocializableNPCs = false, bool onlyShowMetNPCs = false)
         {
-            if (Game1.Date == Date && NpcsWithSchedule != null)
+            if (HasSchedules())
             {
                 return FilterNPCSchedules(onlyShowSocializableNPCs, onlyShowMetNPCs);
             }
@@ -144,7 +147,7 @@ namespace ScheduleViewer
 
                         scheduleEntries = ParseMasterSchedule(rawSchedule, npc);
                     }
-                    NpcsWithSchedule.Add(npc.Name, new NPCSchedule(name, scheduleEntries, npc.CanSocialize, !npc.followSchedule || npc.ignoreScheduleToday ? PrettyPrintLocationName(npc.currentLocation) : null, npc.Sprite.Texture, npc.getMugShotSourceRect()));
+                    NpcsWithSchedule.Add(npc.Name, new NPCSchedule(name, scheduleEntries, npc.CanSocialize, !npc.followSchedule || npc.ignoreScheduleToday ? PrettyPrintLocationName(npc.currentLocation) : null, npc.Sprite, npc.getMugShotSourceRect()));
                 }
                 catch (ArgumentNullException)
                 {

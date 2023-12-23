@@ -70,15 +70,15 @@ namespace ScheduleViewer
             foreach (var item in filteredSchedules)
             {
                 // if not host then need to get sprite info
-                if (item.Value.SpriteTexture == null || item.Value.SourceRect == null)
+                if (item.Value.Sprite == null || item.Value.MugShotSourceRect == null)
                 {
                     NPC npc = Game1.getCharacterFromName(item.Key);
-                    item.Value.SpriteTexture = npc?.Sprite.Texture ?? emptySprite;
-                    item.Value.SourceRect = npc?.getMugShotSourceRect() ?? new Rectangle(0, 0, 16, 24);
+                    item.Value.Sprite = npc?.Sprite;
+                    item.Value.MugShotSourceRect = npc?.getMugShotSourceRect();
                 }
 
                 this.schedules.Add(item.Value);
-                this.sprites.Add(new ClickableTextureComponent("", new Rectangle(base.xPositionOnScreen + IClickableMenu.borderWidth + 4, base.yPositionOnScreen + IClickableMenu.borderWidth + spriteSize / 2, 260, spriteSize), null, "", item.Value.SpriteTexture, (Rectangle)item.Value.SourceRect, 4f));
+                this.sprites.Add(new ClickableTextureComponent("", new Rectangle(base.xPositionOnScreen + IClickableMenu.borderWidth + 4, base.yPositionOnScreen + IClickableMenu.borderWidth + spriteSize / 2, 260, spriteSize), null, "", item.Value.Sprite?.Texture ?? emptySprite, item.Value.MugShotSourceRect ?? new Rectangle(0, 0, 16, 24), 4f));
                 this.characterSlots.Add(new ClickableTextureComponent(new Rectangle(base.xPositionOnScreen + IClickableMenu.borderWidth, 0, base.width - IClickableMenu.borderWidth * 2, rowHeight), null, new Rectangle(0, 0, 0, 0), 4f)
                 {
                     myID = itemIndex,

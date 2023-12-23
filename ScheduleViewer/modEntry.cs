@@ -33,20 +33,23 @@ namespace ScheduleViewer
         /// <param name="helper">Provides simplified APIs for writing mods.</param>
         public override void Entry(IModHelper helper)
         {
+            // set up static properties
             Console = this.Monitor;
             ModHelper = helper;
+            // set up config
             for (int i = 0; i < SortOrderOptions.Length; i++)
             {
                 SortOrderOptions[i] = helper.Translation.Get($"config.option.sort_options.option_{i}");
             }
             Config = helper.ReadConfig<ModConfig>();
-            helper.Events.GameLoop.GameLaunched += OnGameLaunched;
-            helper.Events.Input.ButtonsChanged += OnButtonsChanged;
-            helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
-            helper.Events.Multiplayer.PeerConnected += OnPeerConnected;
-            helper.Events.Multiplayer.ModMessageReceived += OnModMessageReceived;
-            helper.Events.World.NpcListChanged += OnNpcListChanged;
+            // set up event handlers
             helper.Events.Display.MenuChanged += OnMenuChanged;
+            helper.Events.GameLoop.GameLaunched += OnGameLaunched;
+            helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
+            helper.Events.Input.ButtonsChanged += OnButtonsChanged;
+            helper.Events.Multiplayer.ModMessageReceived += OnModMessageReceived;
+            helper.Events.Multiplayer.PeerConnected += OnPeerConnected;
+            helper.Events.World.NpcListChanged += OnNpcListChanged;
         }
 
 
@@ -182,6 +185,14 @@ namespace ScheduleViewer
                             OpenMenu();
                         }
                     }
+                    // close SchedulePage menu
+                    else if (Game1.activeClickableMenu is SchedulesPage)
+                    {
+                        if (Game1.activeClickableMenu.readyToClose())
+                        {
+                            Game1.activeClickableMenu.exitThisMenu();
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -222,8 +233,8 @@ namespace ScheduleViewer
         /// <inheritdoc cref="IWorldEvents.NpcListChanged"/>
         private void OnNpcListChanged(object sender, NpcListChangedEventArgs e)
         {
-            // update current location for NPCs that are ignoring theit schedule
-            if (Game1.IsMasterGame)
+            // update current location for NPCs that are ignoring their schedule
+            if (Game1.IsMasterGame && Schedule.HasSchedules())
             {
                 var npcsToUpdate = Schedule.GetSchedules().Where(schedule => e.Added.Any(npc => npc.Name.Equals(schedule.Key) && schedule.Value.CurrentLocation != null));
                 if (npcsToUpdate.Any())
