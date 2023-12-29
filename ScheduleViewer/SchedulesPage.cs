@@ -116,6 +116,7 @@ namespace ScheduleViewer
 
         public override void draw(SpriteBatch b)
         {
+            b.Draw(Game1.fadeToBlackRect, Game1.graphics.GraphicsDevice.Viewport.Bounds, Color.Black * 0.4f);
             Game1.drawDialogueBox(base.xPositionOnScreen, base.yPositionOnScreen, base.width, base.height, false, true);
 
             b.End();
