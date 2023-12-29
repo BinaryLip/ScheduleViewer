@@ -449,7 +449,7 @@ namespace ScheduleViewer
             }
             if (location.Equals("FarmHouse"))
             {
-                return $"{GetFarmName()} - Farmhouse";
+                return $"{GetFarmName()} - {ModEntry.ModHelper.Translation.Get("farmhouse")}";
             }
             if (location.StartsWith("Island"))
             {

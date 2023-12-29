@@ -48,22 +48,13 @@ namespace ScheduleViewer
             // filter npcs
             IEnumerable<KeyValuePair<string, Schedule.NPCSchedule>> filteredSchedules = Schedule.GetSchedules(ModEntry.Config.OnlyShowSocializableNPCs, ModEntry.Config.OnlyShowMetNPCs);
             // sort npcs
-            if (ModEntry.Config.SortOrder == ModEntry.SortOrderOptions[1])
+            filteredSchedules = ModEntry.Config.NPCSortOrder switch
             {
-                filteredSchedules = filteredSchedules.OrderByDescending(x => x.Value.DisplayName);
-            }
-            else if (ModEntry.Config.SortOrder == ModEntry.SortOrderOptions[2])
-            {      
-                filteredSchedules = filteredSchedules.OrderBy(x => Game1.player.getFriendshipLevelForNPC(x.Key)).ThenBy(x => x.Value.DisplayName);
-            }
-            else if (ModEntry.Config.SortOrder == ModEntry.SortOrderOptions[3])
-            {
-                filteredSchedules = filteredSchedules.OrderByDescending(x => Game1.player.getFriendshipLevelForNPC(x.Key)).ThenBy(x => x.Value.DisplayName);
-            }
-            else
-            {
-                filteredSchedules = filteredSchedules.OrderBy(x => x.Value.DisplayName);
-            }
+                ModConfig.SortType.AlphabeticalDescending => filteredSchedules.OrderByDescending(x => x.Value.DisplayName),
+                ModConfig.SortType.HeartsAscending => filteredSchedules.OrderBy(x => Game1.player.getFriendshipLevelForNPC(x.Key)).ThenBy(x => x.Value.DisplayName),
+                ModConfig.SortType.HeartsDescending => filteredSchedules.OrderByDescending(x => Game1.player.getFriendshipLevelForNPC(x.Key)).ThenBy(x => x.Value.DisplayName),
+                _ => filteredSchedules.OrderBy(x => x.Value.DisplayName),
+            };
 
             // map schedules into slots
             int itemIndex = 0;

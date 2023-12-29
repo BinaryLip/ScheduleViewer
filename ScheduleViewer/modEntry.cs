@@ -20,7 +20,6 @@ namespace ScheduleViewer
         public static IMonitor Console;
         public static IModHelper ModHelper;
         public static Dictionary<string, string> CustomLocationNames = new();
-        public static readonly string[] SortOrderOptions = new string[4];
         private static DialogueBox ErrorDialogue = null;
 
         public const string ModMessageSchedule = "the day's schedule";
@@ -36,11 +35,6 @@ namespace ScheduleViewer
             // set up static properties
             Console = this.Monitor;
             ModHelper = helper;
-            // set up config
-            for (int i = 0; i < SortOrderOptions.Length; i++)
-            {
-                SortOrderOptions[i] = helper.Translation.Get($"config.option.sort_options.option_{i}");
-            }
             Config = helper.ReadConfig<ModConfig>();
             // set up event handlers
             helper.Events.Display.MenuChanged += OnMenuChanged;
@@ -106,6 +100,12 @@ namespace ScheduleViewer
         /// <inheritdoc cref="IGameLoopEvents.GameLaunched"/>
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
         {
+            static ModConfig.SortType parseSortType(string value)
+            {
+                _ = Enum.TryParse(value, out ModConfig.SortType sortType);
+                return sortType;
+            }
+
             // get Generic Mod Config Menu's API (if it's installed)
             var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
             if (configMenu is null) return;
@@ -137,9 +137,10 @@ namespace ScheduleViewer
                 ModManifest,
                 name: () => this.Helper.Translation.Get("config.option.sort_options.name"),
                 tooltip: () => this.Helper.Translation.Get("config.option.sort_options.description"),
-                getValue: () => Config.SortOrder,
-                setValue: value => Config.SortOrder = value,
-                allowedValues: SortOrderOptions
+                getValue: () => Config.NPCSortOrder.ToString(),
+                setValue: value => Config.NPCSortOrder = parseSortType(value),
+                allowedValues: Enum.GetNames(typeof(ModConfig.SortType)),
+                formatAllowedValue: type => this.Helper.Translation.Get($"config.option.sort_options.option_{(ushort) parseSortType(type)}")
             );
             configMenu.AddBoolOption(
                 ModManifest,

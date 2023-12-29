@@ -22,5 +22,6 @@
   "facing_direction_0": "up",
   "facing_direction_1": "right",
   "facing_direction_2": "down",
-  "facing_direction_3": "left"
+  "facing_direction_3": "left",
+  "farmhouse": "Farmhouse"
 }
