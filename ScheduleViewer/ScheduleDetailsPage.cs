@@ -86,6 +86,9 @@ namespace ScheduleViewer
 
         protected List<ClickableTextureComponent> _clickableTextureComponents = new();
 
+        /// <summary>LookupAnything</summary>
+        public NPC hoveredNpc;
+
 
         public ScheduleDetailsPage(int index, List<Schedule.NPCSchedule> allSchedules)
         : base((int)Utility.getTopLeftPositionForCenteringOnScreen(1280, 720).X, (int)Utility.getTopLeftPositionForCenteringOnScreen(1280, 720).Y, 1280, 720, showUpperRightCloseButton: true)
@@ -764,6 +767,7 @@ namespace ScheduleViewer
         {
             this.currentIndex = newIndex;
             NPC npc = this.schedules[newIndex].NPC;
+            this.hoveredNpc = npc;
             this._animatedSprite = npc.Sprite.Clone();
             this._animatedSprite.tempSpriteHeight = -1;
             this._animatedSprite.faceDirection(2);

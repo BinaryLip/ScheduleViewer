@@ -40,6 +40,9 @@ namespace ScheduleViewer
 
         public Friendship emptyFriendship = new();
 
+        /// <summary>LookupAnything</summary>
+        public NPC hoveredNpc;
+
 
         public SchedulesPage(int initialSlotPosition = 0)
             : base(Game1.uiViewport.Width / 2 - (800 + IClickableMenu.borderWidth * 2) / 2, Game1.uiViewport.Height / 2 - (600 + IClickableMenu.borderWidth * 2) / 2, 800 + 36 + IClickableMenu.borderWidth * 2, 600 + IClickableMenu.borderWidth * 2, showUpperRightCloseButton: true)
@@ -349,14 +352,14 @@ namespace ScheduleViewer
         {
             ClickableTextureComponent sprite = this.sprites[i];
             Rectangle characterSlotBounds = this.characterSlots[i].bounds;
+            var (entries, currentLocation, isOnSchedule, displayName, npc) = schedules[i];
             // highlight which NPC the mouse is over
             if (characterSlotBounds.Contains(Game1.getMouseX(), Game1.getMouseY()))
             {
                 b.Draw(Game1.staminaRect, new Rectangle(base.xPositionOnScreen + IClickableMenu.borderWidth - 4, sprite.bounds.Y - 4, characterSlotBounds.Width, characterSlotBounds.Height - 12), Color.White * 0.25f);
+                this.hoveredNpc = npc;
             }
             sprite.draw(b);
-
-            var (entries, currentLocation, isOnSchedule, displayName) = schedules[i];
 
             float lineHeight = Game1.smallFont.MeasureString("W").Y;
             float russianOffsetY = ((LocalizedContentManager.CurrentLanguageCode == LocalizedContentManager.LanguageCode.ru || LocalizedContentManager.CurrentLanguageCode == LocalizedContentManager.LanguageCode.ko) ? ((0f - lineHeight) / 2f) : 0f);
