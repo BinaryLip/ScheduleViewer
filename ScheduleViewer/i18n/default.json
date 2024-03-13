@@ -26,7 +26,8 @@
   "facing_direction_2": "down",
   "facing_direction_3": "left",
   "schedule_details_page.header": "Schedule",
-  "schedule_details_page.can_give_gift": "Can gift today?",
+  "schedule_details_page.gifted_today.header": "Gifted today?",
+  "schedule_details_page.gifted_today.weekly_limit": "Weekly limit reached",
   "schedule_details_page.current_location": "Current Location",
   "location_names.Club": "Casino",
   "location_names.HarveyRoom": "Harvey's Room",
@@ -37,9 +38,9 @@
   "location_names.IslandWest": "Ginger Island West",
   "location_names.LeoTreeHouse": "Treehouse",
   "location_names.SandyHouse": "Oasis",
-  "location_names.SebastianRoom": "Sebastion's Room",
+  "location_names.SebastianRoom": "Sebastian's Room",
   "location_names.SkullCave": "Skull Cavern",
   "location_names.Sunroom": "Caroline's Sunroom",
-  "location_names.WitchSwamp": "Witch's Swamp'",
+  "location_names.WitchSwamp": "Witch's Swamp",
   "location_names.WitchWarpCave": "Witch Warp Cave"
 }
