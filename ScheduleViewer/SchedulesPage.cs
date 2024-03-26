@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
 using System;
@@ -454,11 +455,19 @@ namespace ScheduleViewer
                 index++;
             }
             // update y position for visible sprites
-            for (int i = this.slotPosition; i < this.slotPosition + 5; i++)
+            for (int i = this.slotPosition; i < this.slotPosition + slotsOnPage; i++)
             {
-                if (this.sprites.Count > i)
+                // adding additional logging
+                try
                 {
-                    this.sprites[i].bounds.Y = base.yPositionOnScreen + IClickableMenu.borderWidth + 32 + rowHeight * (i - this.slotPosition) + 32;
+                    if (this.sprites.Count > i)
+                    {
+                        this.sprites[i].bounds.Y = base.yPositionOnScreen + IClickableMenu.borderWidth + 32 + rowHeight * (i - this.slotPosition) + 32;
+                    }
+                }
+                catch
+                {
+                    ModEntry.Console.Log($"Error in the UpdateSlots method. Couldn't update the position of the character sprite at {i} out of {this.sprites.Count} total sprites. Current slotPosition: {this.slotPosition}", LogLevel.Error);
                 }
             }
             base.populateClickableComponentList();
