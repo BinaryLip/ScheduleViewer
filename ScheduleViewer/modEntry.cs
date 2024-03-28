@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using StardewModdingAPI;
+﻿using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
@@ -44,7 +43,6 @@ namespace ScheduleViewer
             helper.Events.Multiplayer.PeerConnected += OnPeerConnected;
             helper.Events.World.NpcListChanged += OnNpcListChanged;
         }
-
 
         /*********
         ** Private methods
