@@ -37,7 +37,7 @@ namespace ScheduleViewer
             // set up event handlers
             helper.Events.Display.MenuChanged += OnMenuChanged;
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
-            helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
+            helper.Events.GameLoop.DayStarted += OnDayStarted;
             helper.Events.Input.ButtonsChanged += OnButtonsChanged;
             helper.Events.Multiplayer.ModMessageReceived += OnModMessageReceived;
             helper.Events.Multiplayer.PeerConnected += OnPeerConnected;
@@ -47,8 +47,8 @@ namespace ScheduleViewer
         /*********
         ** Private methods
         *********/
-        /// <inheritdoc cref="IGameLoopEvents.SaveLoaded"/>
-        private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
+        /// <inheritdoc cref="IGameLoopEvents.DayStarted"/>
+        private void OnDayStarted(object sender, DayStartedEventArgs e)
         {
             // check for mismatched GameVersion and Mods between host and current player
             foreach (IMultiplayerPeer peer in this.Helper.Multiplayer.GetConnectedPlayers())
