@@ -1,9 +1,11 @@
-﻿using StardewModdingAPI;
+﻿using Microsoft.Xna.Framework.Graphics;
+using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace ScheduleViewer
@@ -94,40 +96,40 @@ namespace ScheduleViewer
             }
 
             // get Generic Mod Config Menu's API (if it's installed)
-            var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
-            if (configMenu is null) return;
+            var configMenuApi = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+            if (configMenuApi is null) return;
 
             // register mod
-            configMenu.Register(
+            configMenuApi.Register(
                 ModManifest,
                 () => Config = new ModConfig(),
                 () => Helper.WriteConfig(Config)
             );
 
             // add some config options
-            configMenu.AddSectionTitle(ModManifest, () => this.Helper.Translation.Get("config.title.general"));
-            configMenu.AddKeybind(
+            configMenuApi.AddSectionTitle(ModManifest, () => this.Helper.Translation.Get("config.title.general"));
+            configMenuApi.AddKeybind(
                 ModManifest,
                 name: () => this.Helper.Translation.Get("config.option.show_schedule_key.name"),
                 getValue: () => Config.ShowSchedulesKey,
                 setValue: value => Config.ShowSchedulesKey = value
             );
-            configMenu.AddBoolOption(
+            configMenuApi.AddBoolOption(
                 ModManifest,
                 name: () => this.Helper.Translation.Get("config.option.disable_hover.name"),
                 tooltip: () => this.Helper.Translation.Get("config.option.disable_hover.description"),
                 getValue: () => Config.DisableHover,
                 setValue: value => Config.DisableHover = value
             );
-            configMenu.AddBoolOption(
+            configMenuApi.AddBoolOption(
                 ModManifest,
                 name: () => this.Helper.Translation.Get("config.option.use_large_font.name"),
                 tooltip: () => this.Helper.Translation.Get("config.option.use_large_font.description"),
                 getValue: () => Config.UseLargerFontForScheduleDetails,
                 setValue: value => Config.UseLargerFontForScheduleDetails = value
             );
-            configMenu.AddSectionTitle(ModManifest, () => this.Helper.Translation.Get("config.title.filter_sort"));
-            configMenu.AddTextOption(
+            configMenuApi.AddSectionTitle(ModManifest, () => this.Helper.Translation.Get("config.title.filter_sort"));
+            configMenuApi.AddTextOption(
                 ModManifest,
                 name: () => this.Helper.Translation.Get("config.option.sort_options.name"),
                 tooltip: () => this.Helper.Translation.Get("config.option.sort_options.description"),
@@ -136,20 +138,28 @@ namespace ScheduleViewer
                 allowedValues: Enum.GetNames(typeof(ModConfig.SortType)),
                 formatAllowedValue: type => this.Helper.Translation.Get($"config.option.sort_options.option_{(ushort)parseSortType(type)}")
             );
-            configMenu.AddBoolOption(
+            configMenuApi.AddBoolOption(
                 ModManifest,
                 name: () => this.Helper.Translation.Get("config.option.only_show_met_npcs.name"),
                 tooltip: () => this.Helper.Translation.Get("config.option.only_show_met_npcs.description"),
                 getValue: () => Config.OnlyShowMetNPCs,
                 setValue: value => Config.OnlyShowMetNPCs = value
             );
-            configMenu.AddBoolOption(
+            configMenuApi.AddBoolOption(
                 ModManifest,
                 name: () => this.Helper.Translation.Get("config.option.only_show_socializable_npcs.name"),
                 tooltip: () => this.Helper.Translation.Get("config.option.only_show_socializable_npcs.description"),
                 getValue: () => Config.OnlyShowSocializableNPCs,
                 setValue: value => Config.OnlyShowSocializableNPCs = value
             );
+
+            var mobilePhoneApi = Helper.ModRegistry.GetApi<IMobilePhoneApi>("JoXW.MobilePhone");
+            if (mobilePhoneApi != null)
+            {
+                Texture2D appIcon = Helper.ModContent.Load<Texture2D>("assets/app_icon.png");
+                bool success = mobilePhoneApi.AddApp(Helper.ModRegistry.ModID, "Schedule Viewer", OpenMenu, appIcon);
+                Console.Log($"Added app to Mobile Phone Continued successfully: {success}", LogLevel.Debug);
+            }
         }
 
         /// <inheritdoc cref="IInputEvents.ButtonsChanged"/>
