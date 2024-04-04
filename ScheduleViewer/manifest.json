@@ -5,7 +5,7 @@
   "Description": "Shows NPCs' schedule for the current day.",
   "UniqueID": "BinaryLip.ScheduleViewer",
   "EntryDll": "ScheduleViewer.dll",
-  "MinimumApiVersion": "4.0.0",
+  "MinimumApiVersion": "4.0.4",
   "UpdateKeys": [
     "Nexus:19305"
   ]
