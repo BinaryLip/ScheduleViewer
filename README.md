@@ -61,7 +61,7 @@ Japanese   | [❑](ScheduleViewer/i18n) | &nbsp;
 Korean     | [✓](ScheduleViewer/i18n/ko.json) | [cheesecats](https://www.nexusmods.com/users/88438538) 
 Portuguese | [❑](ScheduleViewer/i18n) | &nbsp;
 Russian    | [❑](ScheduleViewer/i18n) | &nbsp;
-Spanish    | [❑](ScheduleViewer/i18n) | &nbsp;
+Spanish    | [✓](ScheduleViewer/i18n/es.json) | [36095](https://github.com/36095)
 Turkish    | [❑](ScheduleViewer/i18n) | &nbsp;
 
 ## See also
