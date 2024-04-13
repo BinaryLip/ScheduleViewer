@@ -46,7 +46,7 @@ namespace ScheduleViewer
 
         public readonly List<ClickableTextureComponent> questIcons = new();
 
-        private readonly Texture2D emptySprite = ModEntry.ModHelper.ModContent.Load<Texture2D>("assets/Unknown.png");
+        private readonly Texture2D emptySprite = ModEntry.ModHelper.ModContent.Load<Texture2D>("assets/Icons.png");
 
         public Friendship emptyFriendship = new();
 

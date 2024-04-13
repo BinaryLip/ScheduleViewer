@@ -8,5 +8,15 @@
   "MinimumApiVersion": "4.0.4",
   "UpdateKeys": [
     "Nexus:19305"
+  ],
+  "Dependencies": [
+    {
+      "UniqueID": "JoXW.MobilePhone",
+      "IsRequired": false
+    },
+    {
+      "UniqueID": "furyx639.ToolbarIcons",
+      "IsRequired": false
+    }
   ]
 }

@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using System;
 
-namespace ScheduleViewer
+namespace ScheduleViewer.Interfaces
 {
     public interface IMobilePhoneApi
     {

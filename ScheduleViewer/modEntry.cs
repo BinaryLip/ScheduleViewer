@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using ScheduleViewer.Interfaces;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
@@ -158,7 +160,20 @@ namespace ScheduleViewer
             {
                 Texture2D appIcon = Helper.ModContent.Load<Texture2D>("assets/app_icon.png");
                 bool success = mobilePhoneApi.AddApp(Helper.ModRegistry.ModID, "Schedule Viewer", OpenMenu, appIcon);
-                Console.Log($"Added app to Mobile Phone Continued successfully: {success}", LogLevel.Debug);
+                Console.Log($"Added app to Mobile Phone Continued successfully? {success}", LogLevel.Debug);
+            }
+
+            var toolbarIconsApi = Helper.ModRegistry.GetApi<IToolbarIconsApi>("furyx639.ToolbarIcons");
+            if (toolbarIconsApi != null)
+            {
+                toolbarIconsApi.AddToolbarIcon(ModManifest.UniqueID, Helper.ModContent.GetInternalAssetName("assets/Icons.png").BaseName, new Rectangle(0, 24, 16, 16), this.Helper.Translation.Get("schedule_details_page.header"));
+                toolbarIconsApi.Subscribe(args =>
+                {
+                    if (args.Id.Equals(ModManifest.UniqueID))
+                    {
+                        OpenMenu();
+                    }
+                });
             }
         }
 
