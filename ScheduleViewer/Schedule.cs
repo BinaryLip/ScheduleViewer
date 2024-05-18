@@ -239,6 +239,11 @@ namespace ScheduleViewer
                     }
                     NpcsWithSchedule.Add($"{name}-{ModEntry.ModHelper.ModRegistry.ModID}-{count}", new NPCSchedule(npc, scheduleEntries));
                 }
+                catch (Exception ex)
+                {
+                    ModEntry.Console.Log($"Something went wrong when trying to add {name}'s schedule. See below for more details:", LogLevel.Error);
+                    ModEntry.Console.Log(ex.ToString(), LogLevel.Error);
+                }
                 return true;
             });
 
@@ -373,6 +378,8 @@ namespace ScheduleViewer
 
         public static void UpdateScheduleEntriesCanAccess(NPCSchedule schedule)
         {
+            if (schedule.Entries == null) return;
+
             List<TileArea> tileAreasForNpc = AccessTileAreas.FindAll(tileArea => tileArea.Npcs.Contains(schedule.NPC.Name));
             if (!tileAreasForNpc.Any()) return;
 
