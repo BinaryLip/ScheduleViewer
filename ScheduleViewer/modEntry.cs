@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Newtonsoft.Json.Linq;
 using ScheduleViewer.Interfaces;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -26,6 +27,8 @@ namespace ScheduleViewer
         public const string ModMessageSchedule = "the day's schedule";
         public const string ModMessageCurrentLocation = "NPC current location update";
 
+        public static readonly string CustomDataPath = "Mods/BinaryLip.ScheduleViewer/TileAreas";
+
         /*********
         ** Public methods
         *********/
@@ -38,9 +41,12 @@ namespace ScheduleViewer
             ModHelper = helper;
             Config = helper.ReadConfig<ModConfig>();
             // set up event handlers
+            //helper.Events.Content.AssetReady += OnAssetReady; //not sure if needed
+            helper.Events.Content.AssetRequested += OnAssetRequested;
             helper.Events.Display.MenuChanged += OnMenuChanged;
-            helper.Events.GameLoop.GameLaunched += OnGameLaunched;
             helper.Events.GameLoop.DayStarted += OnDayStarted;
+            helper.Events.GameLoop.GameLaunched += OnGameLaunched;
+            helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
             helper.Events.Input.ButtonsChanged += OnButtonsChanged;
             helper.Events.Multiplayer.ModMessageReceived += OnModMessageReceived;
             helper.Events.Multiplayer.PeerConnected += OnPeerConnected;
@@ -50,6 +56,12 @@ namespace ScheduleViewer
         /*********
         ** Private methods
         *********/
+        /// <inheritdoc cref="IGameLoopEvents.SaveLoaded"/>
+        private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
+        {
+            Schedule.LoadTileAreas();
+        }
+
         /// <inheritdoc cref="IGameLoopEvents.DayStarted"/>
         private void OnDayStarted(object sender, DayStartedEventArgs e)
         {
@@ -276,6 +288,25 @@ namespace ScheduleViewer
             if (e.NewMenu is SchedulesPage)
             {
                 ErrorDialogue = null;
+            }
+        }
+
+        /// <inheritdoc cref="IContentEvents.AssetRequested"/>
+        private void OnAssetRequested(object sender, AssetRequestedEventArgs e)
+        {
+            if (e.Name.IsEquivalentTo(CustomDataPath))
+            {
+                e.LoadFromModFile<Dictionary<string, JObject>>("assets/tile_areas.json", AssetLoadPriority.Medium);
+            }
+        }
+
+        /// <inheritdoc cref="IContentEvents.AssetReady"/>
+        private void OnAssetReady(object sender, AssetReadyEventArgs e)
+        {
+            // update tile areas if asset gets updated. will this ever happen?
+            if (e.Name.IsEquivalentTo(CustomDataPath))
+            {
+                Schedule.LoadTileAreas();
             }
         }
 

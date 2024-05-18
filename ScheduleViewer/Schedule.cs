@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using StardewModdingAPI;
 using StardewModdingAPI.Utilities;
 using StardewValley;
@@ -13,6 +14,8 @@ namespace ScheduleViewer
     static public class Schedule
     {
         private static WorldDate Date;
+        private static readonly List<TileArea> AccessTileAreas = new();
+        private static readonly List<TileArea> GeneralTileAreas = new();
         private static Dictionary<string, NPCSchedule> NpcsWithSchedule;
 
         public class ScheduleEntry
@@ -20,10 +23,18 @@ namespace ScheduleViewer
             public int Time { get; init; }
             public int X { get; init; }
             public int Y { get; init; }
+            /// <summary>Internal game location name. </summary>
             public string Location { get; init; }
             public int FacingDirection { get; init; }
             public string Animation { get; init; }
+
+            [JsonIgnore]
             protected string _hoverText;
+            [JsonIgnore]
+            protected string _locationName;
+            [JsonIgnore]
+            protected string _tileAreaDisplayName;
+
             public string HoverText
             {
                 get
@@ -45,24 +56,62 @@ namespace ScheduleViewer
                     return _hoverText;
                 }
             }
+            [JsonIgnore]
+            public string LocationName
+            {
+                get
+                {
+                    if (_locationName != null)
+                    {
+                        return _locationName;
+                    }
+                    _locationName = PrettyPrintLocationName(Location);
+                    return _locationName;
+                }
+            }
+            [JsonIgnore]
+            public string TileAreaDisplayName
+            {
+                get
+                {
+                    if (_tileAreaDisplayName != null)
+                    {
+                        return _tileAreaDisplayName;
+                    }
+                    foreach (TileArea tileArea in GeneralTileAreas)
+                    {
+                        if (tileArea.Location.Equals(this.Location) && IsScheduleEntryInTileArea(tileArea, this))
+                        {
+                            _tileAreaDisplayName = tileArea.DisplayName;
+                            return _tileAreaDisplayName;
+                        }
+                    }
+                    return string.Empty;
+                }
+            }
+
+            [JsonIgnore]
+            public bool CanAccess { get; set; }
 
             public ScheduleEntry(SchedulePathDescription schedulePathDescription)
             {
                 Time = schedulePathDescription.time;
                 X = schedulePathDescription.targetTile.X;
                 Y = schedulePathDescription.targetTile.Y;
-                Location = PrettyPrintLocationName(schedulePathDescription.targetLocationName);
+                Location = schedulePathDescription.targetLocationName;
                 FacingDirection = schedulePathDescription.facingDirection;
                 Animation = schedulePathDescription.endOfRouteBehavior;
+                CanAccess = true;
             }
 
             [JsonConstructor]
             public ScheduleEntry(int time, Vector2 position, int facingDirection, string location, string animation)
             {
                 Time = time;
-                Location = PrettyPrintLocationName(location);
+                Location = location;
                 FacingDirection = facingDirection;
                 Animation = animation;
+                CanAccess = true;
                 // convert position (pixels) to tile coords
                 Vector2 tile = position / 64f;
                 X = (int)tile.X;
@@ -71,7 +120,7 @@ namespace ScheduleViewer
 
             public override string ToString()
             {
-                return $"{Game1.getTimeOfDayString(this.Time != 0 ? this.Time : 600)} {this.Location ?? "Unknown"}";
+                return $"{Game1.getTimeOfDayString(this.Time != 0 ? this.Time : 600)} {this.LocationName ?? "Unknown"}{(string.IsNullOrEmpty(this.TileAreaDisplayName) ? string.Empty : $" ({this.TileAreaDisplayName})")}";
             }
         }
 
@@ -188,7 +237,7 @@ namespace ScheduleViewer
                     {
                         ModEntry.Console.Log($"Warning! Found an NPC whose name is already in the list. There have been {count} instances of {name} observed currently. You may seen duplicates of {name} in the list.", LogLevel.Warn);
                     }
-                    NpcsWithSchedule.Add($"{name} ({count})", new NPCSchedule(npc, scheduleEntries));
+                    NpcsWithSchedule.Add($"{name}-{ModEntry.ModHelper.ModRegistry.ModID}-{count}", new NPCSchedule(npc, scheduleEntries));
                 }
                 return true;
             });
@@ -277,5 +326,83 @@ namespace ScheduleViewer
             }
             return location.DisplayName;
         }
+
+        #region Tile Areas
+        public record TileArea(string Location, Rectangle? TileRectangle, string DisplayName, string[] Npcs = null, Point[] Tiles = null);
+
+        public static void LoadTileAreas()
+        {
+            Dictionary<string, JObject> tileAreas = Game1.content.Load<Dictionary<string, JObject>>(ModEntry.CustomDataPath);
+            foreach (var entry in tileAreas)
+            {
+                JObject tileArea = entry.Value;
+                try
+                {
+                    Rectangle? tileRectangle = null;
+                    if (tileArea.ContainsKey("TileRectangle"))
+                    {
+                        JObject tr = tileArea.Value<JObject>("TileRectangle");
+                        tileRectangle = new(tr.Value<int>("X"), tr.Value<int>("Y"), tr.Value<int>("Width"), tr.Value<int>("Height"));
+                    }
+                    Point[] tiles = tileArea.ContainsKey("Tiles")
+                        ? tileArea.Value<JArray>("Tiles").Select(tile => new Point(tile.Value<int>("X"), tile.Value<int>("Y"))).ToArray()
+                        : null;
+                    string[] npcs = tileArea.ContainsKey("Npcs")
+                        ? tileArea.Value<JArray>("Npcs").Select(npc => npc.ToString()).ToArray()
+                        : null;
+                    string displayName = tileArea.Value<string>("DisplayName");
+                    displayName = displayName.StartsWith("tile_area") ? ModEntry.ModHelper.Translation.Get(displayName) : displayName;
+
+                    TileArea toAdd = new(tileArea.Value<string>("Location"), tileRectangle, displayName, npcs, tiles);
+
+                    if (toAdd.Npcs == null)
+                    {
+                        GeneralTileAreas.Add(toAdd);
+                    }
+                    else
+                    {
+                        AccessTileAreas.Add(toAdd);
+                    }
+                }
+                catch
+                {
+                    ModEntry.Console.Log($"Failed to load TileArea \"{tileArea.Value<string>("DisplayName")}\" in \"{tileArea.Value<string>("Location")}\"", LogLevel.Warn);
+                }
+            }
+        }
+
+        public static void UpdateScheduleEntriesCanAccess(NPCSchedule schedule)
+        {
+            List<TileArea> tileAreasForNpc = AccessTileAreas.FindAll(tileArea => tileArea.Npcs.Contains(schedule.NPC.Name));
+            if (!tileAreasForNpc.Any()) return;
+
+            foreach (var entry in schedule.Entries)
+            {
+                TileArea location = tileAreasForNpc.Find(tileArea => entry.Location.Equals(tileArea.Location));
+                if (location == null) continue;
+
+                if (IsScheduleEntryInTileArea(location, entry))
+                {
+                    bool hasTwoHearts = location.Npcs.Any(name => Game1.player.getFriendshipHeartLevelForNPC(name) >= 2);
+                    entry.CanAccess = hasTwoHearts;
+                }
+            }
+        }
+
+        private static bool IsScheduleEntryInTileArea(TileArea tileArea, ScheduleEntry entry)
+        {
+            bool? inTileArea = null;
+            if (tileArea.TileRectangle != null)
+            {
+                inTileArea = ((Rectangle)tileArea.TileRectangle).Contains(entry.X, entry.Y);
+            }
+            if (inTileArea != true && tileArea.Tiles != null)
+            {
+                inTileArea = tileArea.Tiles.Contains(new Point(entry.X, entry.Y));
+            }
+            inTileArea ??= true;
+            return (bool)inTileArea;
+        }
+        #endregion
     }
 }

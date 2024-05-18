@@ -42,5 +42,9 @@
   "location_names.SkullCave": "Skull Cavern",
   "location_names.Sunroom": "Caroline's Sunroom",
   "location_names.WitchSwamp": "Witch's Swamp",
-  "location_names.WitchWarpCave": "Witch Warp Cave"
+  "location_names.WitchWarpCave": "Witch Warp Cave",
+  "tile_area.TownIceCreamStand": "Ice Cream Stand",
+  "tile_area.TownPlayground": "Playground",
+  "tile_area.TownSquare": "Square",
+  "tile_area.TownWaterFountain": "Water Fountain"
 }
