@@ -213,6 +213,12 @@ namespace ScheduleViewer
                 {
                     if (npc.followSchedule)
                     {
+                        if (npc.Schedule == null || !npc.Schedule.Any())
+                        {
+                            // if following schedule but don't have entries then don't add to list
+                            return true;
+                        }
+
                         scheduleEntries = new()
                         {
                             new(0, npc.DefaultPosition, npc.DefaultFacingDirection, npc.DefaultMap, null)

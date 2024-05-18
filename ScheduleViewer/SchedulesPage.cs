@@ -488,7 +488,7 @@ namespace ScheduleViewer
             int y = sprite.bounds.Y - 4;
             int slot = i - this.slotPosition;
 
-            if (isOnSchedule)
+            if (isOnSchedule && entries != null)
             {
                 float yOffset = 0;
                 int activeEntryIndex = 0;

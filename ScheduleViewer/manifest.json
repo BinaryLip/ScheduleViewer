@@ -1,7 +1,7 @@
 {
   "Name": "Schedule Viewer",
   "Author": "BinaryLip",
-  "Version": "3.0.1",
+  "Version": "3.1.0",
   "Description": "Shows NPCs' schedule for the current day.",
   "UniqueID": "BinaryLip.ScheduleViewer",
   "EntryDll": "ScheduleViewer.dll",
