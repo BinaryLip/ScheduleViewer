@@ -71,7 +71,7 @@ on the wiki for help contributing translations.
 | Portuguese | [✓](ScheduleViewer/i18n/pt.json) | [Sxdic](https://www.nexusmods.com/users/34556965)       |
 | Russian    | [❑](ScheduleViewer/i18n)         | &nbsp;                                                  |
 | Spanish    | [✓](ScheduleViewer/i18n/es.json) | [36095](https://github.com/36095)                       |
-| Turkish    | [❑](ScheduleViewer/i18n)         | &nbsp;                                                  |
+| Turkish    | [✓](ScheduleViewer/i18n/tr.json) | [KzyNothh](https://www.nexusmods.com/users/94536368)    |
 
 ## See also
 
