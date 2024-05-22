@@ -229,8 +229,7 @@ namespace ScheduleViewer
             }
             catch (Exception ex)
             {
-                Console.Log("Error opening the Schedule Viewer. See details below:", LogLevel.Error);
-                Console.Log(ex.ToString(), LogLevel.Error);
+                Console.Log($"Error opening the Schedule Viewer. See details below:\n{ex}", LogLevel.Error);
             }
         }
 

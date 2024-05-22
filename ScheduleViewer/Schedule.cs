@@ -384,20 +384,35 @@ namespace ScheduleViewer
 
         public static void UpdateScheduleEntriesCanAccess(NPCSchedule schedule)
         {
-            if (schedule.Entries == null) return;
+            if (schedule.Entries == null || !schedule.Entries.Any()) return;
 
-            List<TileArea> tileAreasForNpc = AccessTileAreas.FindAll(tileArea => tileArea.Npcs.Contains(schedule.NPC.Name));
-            if (!tileAreasForNpc.Any()) return;
+            List<TileArea> tileAreasForNpc = null;
+            try
+            {
+                tileAreasForNpc = AccessTileAreas.FindAll(tileArea => tileArea.Npcs.Contains(schedule.NPC.Name));
+            }
+            catch (Exception ex)
+            {
+                ModEntry.Console.Log($"Error checking AccessTileAreas for {schedule.DisplayName}'s schedule. See details below:\n{ex}", LogLevel.Error);
+            }
+            if (tileAreasForNpc == null || !tileAreasForNpc.Any()) return;
 
             foreach (var entry in schedule.Entries)
             {
-                TileArea location = tileAreasForNpc.Find(tileArea => entry.Location.Equals(tileArea.Location));
-                if (location == null) continue;
-
-                if (IsScheduleEntryInTileArea(location, entry))
+                try
                 {
-                    bool hasTwoHearts = location.Npcs.Any(name => Game1.player.getFriendshipHeartLevelForNPC(name) >= 2);
-                    entry.CanAccess = hasTwoHearts;
+                    TileArea location = tileAreasForNpc.Find(tileArea => entry.Location.Equals(tileArea.Location));
+                    if (location == null) continue;
+
+                    if (IsScheduleEntryInTileArea(location, entry))
+                    {
+                        bool hasTwoHearts = location.Npcs.Any(name => Game1.player.getFriendshipHeartLevelForNPC(name) >= 2);
+                        entry.CanAccess = hasTwoHearts;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ModEntry.Console.Log($"Error checking AccessTileAreas for {schedule.DisplayName}'s schedule entry: {entry}. See details below:\n{ex}", LogLevel.Error);
                 }
             }
         }
