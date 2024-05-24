@@ -13,6 +13,7 @@ Run the game using SMAPI.
 | setting                           | default                | what it does                                                                                           |
 | --------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------ |
 | `ShowSchedulesKey`                | `V`                    | the key to open the Schedule Viewer                                                                    |
+| `UseAddress`                      | `true`                 | use Pelican Town address instead of "Home of ..." for schedule entries i.e. "2 Willow Lane" instead of "Home of Emily & Haley". (Changes may not take effect until the next day.) |
 | `DisableHover`                    | `false`                | don't show tile, facing direction, and animation info on hover                                         |
 | `UseLargerFontForScheduleDetails` | `false`                | use a larger font size on the Schedule Details page (longer location names may get cut off if enabled) |
 | `NPCSortOrder`                    | Alphabetical Ascending | the order the NPCs are sorted in the Schedule Viewer (Alphabetical/Heart Level & Ascending/Descending) |
@@ -22,7 +23,7 @@ Run the game using SMAPI.
 
 ## Compatibility
 
-Works with Stardew Valley 1.6 on Windows/Linux/Mac
+Works with Stardew Valley 1.6+ on Windows/Linux/Mac
 
 Works in single-player and multiplayer (mods need to match for it to be accurate).
 
@@ -39,6 +40,8 @@ No known mod conflicts
 - [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098) - UI for editing config options
 - [Lookup Anything](https://www.nexusmods.com/stardewvalley/mods/541) - able to lookup NPC information from the Schedule Viewer and details pages
 - [Mobile Phone Continued](https://www.nexusmods.com/stardewvalley/mods/21017) - able to open the Schedule Viewer from the Mobile Phone
+- [Stardew Valley Expanded](https://www.nexusmods.com/stardewvalley/mods/3753) - see [SVETileAreas](..\SVETileAreas) for optional download that enhances schedule details for custom SVE locations
+- [Toolbar Icons](https://www.nexusmods.com/stardewvalley/mods/21017) - able to open the Schedule Viewer from a toolbar icon
 
 To integrate your mod see the [author guide](author-guide.md) for more info.
 
@@ -76,3 +79,4 @@ on the wiki for help contributing translations.
 ## See also
 
 - [Nexus Mods](https://www.nexusmods.com/stardewvalley/mods/19305)
+- [CurseForge](https://www.curseforge.com/stardewvalley/mods/schedule-viewer)

@@ -12,6 +12,7 @@ Tile areas are used by this mod to enhance aspects of the UI and are split into 
   Examples for the Town location include the Ice Cream Stand, Playground, Square, and Water Fountain
 
 ### Tile Area Object
+
 <table>
 <thead>
   <tr>
@@ -27,6 +28,7 @@ Tile areas are used by this mod to enhance aspects of the UI and are split into 
     <td><code>DisplayName</code></td>
     <td>
       the name of the tile area to display to the user<br>
+      Note: if the string starts with <code>String\</code> then the mod will use <code>Game1.content.LoadString(DisplayName)</code> as the name of the tile area <br>
       ex: <code>"Abigail's Bedroom"</code>, <code>"Ice Cream Stand"</code><br>
     </td>
     <td><code>string</code></td>
@@ -91,6 +93,16 @@ Tile areas are used by this mod to enhance aspects of the UI and are split into 
     <td>Optional</td>
     <td>Optional</td>
   </tr>
+  <tr>
+    <td><code>OverrideLocationName</code></td>
+    <td>
+      if true <code>DisplayName</code> overrides the <code>Location</code>'s display name<br>
+      if false <code>DisplayName</code> gets added to the end of the <code>Location</code>'s display name in parenthesis<br>
+    </td>
+    <td><code>boolean</code></td>
+    <td>Optional<br>if no tiles<br>otherwise<br>not used</td>
+    <td>Optional</td>
+  </tr>
 </tbody>
 </table>
 
@@ -118,7 +130,7 @@ or [SMAPI's content API](https://stardewvalleywiki.com/Modding:Modder_Guide/APIs
     },
     // Ex: Access Tile Area
     "{{ModId}}_SamBedroom": {
-      "Npcs": ["Sam"],
+      "Npcs": [ "Sam" ],
       "DisplayName": "Sam's Bedroom",
       "Location": "SamHouse",
       "TileRectangle": {
@@ -136,16 +148,25 @@ or [SMAPI's content API](https://stardewvalleywiki.com/Modding:Modder_Guide/APIs
       ]
     },
     // Ex: Access Tile Area for whole location
-    "{{ModId}}_SebastianBedroom": {
-      "Npcs": ["Sebastian"],
-      "DisplayName": "Sebastian's Bedroom",
-      "Location": "SebastianRoom"
+    "{{ModId}}_ElliottBedroom": {
+      "Npcs": [ "Elliott" ],
+      "DisplayName": "Elliott's Bedroom",
+      "Location": "ElliottHouse"
+    },
+    // Ex: Access Tile Area for whole location
+    //   + overrides the location's display name
+    //   + uses a translation for the DisplayName
+    "{{ModId}}_CarolineSunroom": {
+      "Npcs": [ "Caroline" ],
+      "DisplayName": "{{i18n:LocationName.Sunroom}}",
+      "Location": "Sunroom",
+      "OverrideLocationName": true
     }
   }
 }
 ```
 
-You can add as many Custom Tile Areas as you like but the entry names must be unique. An easy way to ensure that is by prepending the entry name with the `{{ModId}}` CP token. For more examples of Custom Tile Areas see [tile_areas.json](/ScheduleViewer/assets/tile_areas.json)
+You can add as many Custom Tile Areas as you like but the entry names must be unique. An easy way to ensure that is by prepending the entry name with the `{{ModId}}` CP token. For more examples of Custom Tile Areas see [SVETileAreas/content.json](/SVETileAreas/content.json)
 
 ### Translations
 

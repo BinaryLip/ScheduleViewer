@@ -13,9 +13,15 @@ namespace ScheduleViewer
 {
     static public class Schedule
     {
+        /// <summary>The date that <see cref="NpcsWithSchedule">NpcsWithSchedule</see> was generated for</summary>
         private static WorldDate Date;
+        /// <summary>Tile Areas that the player needs to have 2 or more hearts with to enter</summary>
         private static readonly List<TileArea> AccessTileAreas = new();
+        /// <summary>Tile Areas that describe a named location</summary>
         private static readonly List<TileArea> GeneralTileAreas = new();
+        /// <summary>Map of location internal names to display names that overrides the location's DisplayName</summary>
+        private static readonly Dictionary<string, string> LocationOverrides = new();
+        /// <summary>Map of internal NPC names to their schedule for <see cref="Date">Date</see></summary>
         private static Dictionary<string, NPCSchedule> NpcsWithSchedule;
 
         public class ScheduleEntry
@@ -32,9 +38,8 @@ namespace ScheduleViewer
             protected string _hoverText;
             [JsonIgnore]
             protected string _locationName;
-            [JsonIgnore]
-            protected string _tileAreaDisplayName;
 
+            [JsonIgnore]
             public string HoverText
             {
                 get
@@ -65,28 +70,18 @@ namespace ScheduleViewer
                     {
                         return _locationName;
                     }
-                    _locationName = PrettyPrintLocationName(Location);
-                    return _locationName;
-                }
-            }
-            [JsonIgnore]
-            public string TileAreaDisplayName
-            {
-                get
-                {
-                    if (_tileAreaDisplayName != null)
-                    {
-                        return _tileAreaDisplayName;
-                    }
+                    string locationName = PrettyPrintLocationName(Location) ?? "???";
+                    Point tile = new(X, Y);
                     foreach (TileArea tileArea in GeneralTileAreas)
                     {
-                        if (tileArea.Location.Equals(this.Location) && IsScheduleEntryInTileArea(tileArea, this))
+                        if (tileArea.Location.Equals(this.Location) && IsTileInTileArea(tileArea, tile))
                         {
-                            _tileAreaDisplayName = tileArea.DisplayName;
-                            return _tileAreaDisplayName;
+                            locationName = tileArea.OverrideLocationName ? tileArea.DisplayName : $"{locationName} ({tileArea.DisplayName})";
+                            break;
                         }
                     }
-                    return string.Empty;
+                    _locationName = locationName;
+                    return _locationName;
                 }
             }
 
@@ -120,7 +115,7 @@ namespace ScheduleViewer
 
             public override string ToString()
             {
-                return $"{Game1.getTimeOfDayString(this.Time != 0 ? this.Time : 600)} {this.LocationName ?? "Unknown"}{(string.IsNullOrEmpty(this.TileAreaDisplayName) ? string.Empty : $" ({this.TileAreaDisplayName})")}";
+                return $"{Game1.getTimeOfDayString(this.Time != 0 ? this.Time : 600)} {this.LocationName ?? "Unknown"}";
             }
         }
 
@@ -176,15 +171,25 @@ namespace ScheduleViewer
             NpcsWithSchedule = Message.Item2;
         }
 
-        internal static void UpdateCurrentLocation((string, string) Message)
+        public static void ClearSchedules()
         {
-            try
+            ModEntry.Console.Log("Clearing any previously generated schedules.", LogLevel.Debug);
+            Date = null; 
+            NpcsWithSchedule = null;
+        }
+
+        internal static void UpdateCurrentLocation(string location, string[] npcsToUpdate)
+        {
+            foreach (var npc in npcsToUpdate)
             {
-                NpcsWithSchedule[Message.Item1].CurrentLocation = Message.Item2;
-            }
-            catch
-            {
-                ModEntry.Console.Log($"Error when trying to update the current location for {Message.Item1}.", LogLevel.Warn);
+                try
+                {
+                    NpcsWithSchedule[npc].CurrentLocation = location;
+                }
+                catch
+                {
+                    ModEntry.Console.Log($"Error when trying to update the current location for {npc} to {location}.", LogLevel.Warn);
+                }
             }
         }
 
@@ -274,6 +279,20 @@ namespace ScheduleViewer
         /// <returns>true if a value is found, otherwise false</returns>
         private static bool TryGetOverrideLocationName(string location, out string overrideName)
         {
+            // check tile areas for an override name first
+            if (LocationOverrides.TryGetValue(location, out string tileAreaOverrideName))
+            {
+                overrideName = tileAreaOverrideName;
+                return true;
+            }
+
+            // if not using address then don't need to override vanilla location display names
+            if (!ModEntry.Config.UseAddress)
+            {
+                overrideName = null;
+                return false;
+            }
+
             switch (location)
             {
                 // override game's displayName in favor of address
@@ -283,9 +302,6 @@ namespace ScheduleViewer
                 case "JoshHouse":
                     overrideName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11092");
                     return true;
-                case "QiNutRoom":
-                    overrideName = Game1.content.LoadString("Strings\\WorldMap:GingerIsland_West_QiWalnutRoom");
-                    return true;
                 case "SamHouse":
                     overrideName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11071");
                     return true;
@@ -294,23 +310,6 @@ namespace ScheduleViewer
                     return true;
                 case "Trailer_Big":
                     overrideName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.PamHouse");
-                    return true;
-                // locations without a game provided displayName
-                case "Club":
-                case "HarveyRoom":
-                case "IslandEast":
-                case "IslandHut":
-                case "IslandNorth":
-                case "IslandSouth":
-                case "IslandWest":
-                case "LeoTreeHouse":
-                case "SandyHouse":
-                case "SebastianRoom":
-                case "SkullCave":
-                case "Sunroom":
-                case "WitchSwamp":
-                case "WitchWarpCave":
-                    overrideName = ModEntry.ModHelper.Translation.Get($"location_names.{location}");
                     return true;
                 default:
                     overrideName = null;
@@ -339,7 +338,7 @@ namespace ScheduleViewer
         }
 
         #region Tile Areas
-        public record TileArea(string Location, Rectangle? TileRectangle, string DisplayName, string[] Npcs = null, Point[] Tiles = null);
+        public record TileArea(string Location, Rectangle? TileRectangle, string DisplayName, string[] Npcs = null, Point[] Tiles = null, bool OverrideLocationName = false);
 
         public static void LoadTileAreas()
         {
@@ -361,10 +360,12 @@ namespace ScheduleViewer
                     string[] npcs = tileArea.ContainsKey("Npcs")
                         ? tileArea.Value<JArray>("Npcs").Select(npc => npc.ToString()).ToArray()
                         : null;
+                    string location = tileArea.Value<string>("Location");
                     string displayName = tileArea.Value<string>("DisplayName");
-                    displayName = displayName.StartsWith("tile_area") ? ModEntry.ModHelper.Translation.Get(displayName) : displayName;
+                    displayName = displayName.StartsWith("tile_area") ? ModEntry.ModHelper.Translation.Get(displayName) : displayName.StartsWith("Strings\\") ? Game1.content.LoadString(displayName) : displayName;
+                    bool overrideLocationName = tileArea.ContainsKey("OverrideLocationName") && tileArea.Value<bool>("OverrideLocationName");
 
-                    TileArea toAdd = new(tileArea.Value<string>("Location"), tileRectangle, displayName, npcs, tiles);
+                    TileArea toAdd = new(location, tileRectangle, displayName, npcs, tiles, overrideLocationName);
 
                     if (toAdd.Npcs == null)
                     {
@@ -373,6 +374,10 @@ namespace ScheduleViewer
                     else
                     {
                         AccessTileAreas.Add(toAdd);
+                    }
+                    if (overrideLocationName && tileRectangle == null && tiles == null)
+                    {
+                        LocationOverrides[location] = displayName;
                     }
                 }
                 catch
@@ -404,7 +409,7 @@ namespace ScheduleViewer
                     TileArea location = tileAreasForNpc.Find(tileArea => entry.Location.Equals(tileArea.Location));
                     if (location == null) continue;
 
-                    if (IsScheduleEntryInTileArea(location, entry))
+                    if (IsTileInTileArea(location, new Point(entry.X, entry.Y)))
                     {
                         bool hasTwoHearts = location.Npcs.Any(name => Game1.player.getFriendshipHeartLevelForNPC(name) >= 2);
                         entry.CanAccess = hasTwoHearts;
@@ -417,16 +422,16 @@ namespace ScheduleViewer
             }
         }
 
-        private static bool IsScheduleEntryInTileArea(TileArea tileArea, ScheduleEntry entry)
+        private static bool IsTileInTileArea(TileArea tileArea, Point tile)
         {
             bool? inTileArea = null;
             if (tileArea.TileRectangle != null)
             {
-                inTileArea = ((Rectangle)tileArea.TileRectangle).Contains(entry.X, entry.Y);
+                inTileArea = ((Rectangle)tileArea.TileRectangle).Contains(tile);
             }
             if (inTileArea != true && tileArea.Tiles != null)
             {
-                inTileArea = tileArea.Tiles.Contains(new Point(entry.X, entry.Y));
+                inTileArea = tileArea.Tiles.Contains(tile);
             }
             inTileArea ??= true;
             return (bool)inTileArea;

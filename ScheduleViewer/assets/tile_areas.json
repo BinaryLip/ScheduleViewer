@@ -1,6 +1,6 @@
 {
   "AbigailBedroom": {
-    "Npcs": ["Abigail"],
+    "Npcs": [ "Abigail" ],
     "DisplayName": "Abigail's Bedroom",
     "Location": "SeedShop",
     "TileRectangle": {
@@ -11,7 +11,7 @@
     }
   },
   "AlexBedroom": {
-    "Npcs": ["Alex"],
+    "Npcs": [ "Alex" ],
     "DisplayName": "Alex's Bedroom",
     "Location": "JoshHouse",
     "TileRectangle": {
@@ -22,7 +22,7 @@
     }
   },
   "CarolinePierreBedroom": {
-    "Npcs": ["Caroline", "Pierre"],
+    "Npcs": [ "Caroline", "Pierre" ],
     "DisplayName": "Caroline and Pierre's Bedroom",
     "Location": "SeedShop",
     "TileRectangle": {
@@ -33,12 +33,13 @@
     }
   },
   "CarolineSunroom": {
-    "Npcs": ["Caroline"],
-    "DisplayName": "Caroline's Sunroom",
-    "Location": "Sunroom"
+    "Npcs": [ "Caroline" ],
+    "DisplayName": "tile_area.Sunroom",
+    "Location": "Sunroom",
+    "OverrideLocationName": true
   },
   "ClintBedroom": {
-    "Npcs": ["Clint"],
+    "Npcs": [ "Clint" ],
     "DisplayName": "Clint's Bedroom",
     "Location": "Blacksmith",
     "TileRectangle": {
@@ -49,7 +50,7 @@
     }
   },
   "DemetriusRobinBedroom": {
-    "Npcs": ["Robin", "Demetrius"],
+    "Npcs": [ "Robin", "Demetrius" ],
     "DisplayName": "Demetrius and Robin's Bedroom",
     "Location": "ScienceHouse",
     "TileRectangle": {
@@ -60,12 +61,12 @@
     }
   },
   "ElliottBedroom": {
-    "Npcs": ["Elliott"],
+    "Npcs": [ "Elliott" ],
     "DisplayName": "Elliott's Bedroom",
     "Location": "ElliottHouse"
   },
   "EmilyBedroom": {
-    "Npcs": ["Emily"],
+    "Npcs": [ "Emily" ],
     "DisplayName": "Emily's Bedroom",
     "Location": "HaleyHouse",
     "TileRectangle": {
@@ -76,7 +77,7 @@
     }
   },
   "EvelynGeorgeBedroom": {
-    "Npcs": ["Evelyn", "George"],
+    "Npcs": [ "Evelyn", "George" ],
     "DisplayName": "Evelyn and George's Bedroom",
     "Location": "JoshHouse",
     "TileRectangle": {
@@ -87,7 +88,7 @@
     }
   },
   "GusBedroom": {
-    "Npcs": ["Gus"],
+    "Npcs": [ "Gus" ],
     "DisplayName": "Gus's Bedroom",
     "Location": "Saloon",
     "TileRectangle": {
@@ -98,7 +99,7 @@
     }
   },
   "HaleyBedroom": {
-    "Npcs": ["Haley"],
+    "Npcs": [ "Haley" ],
     "DisplayName": "Haley's Bedroom",
     "Location": "HaleyHouse",
     "TileRectangle": {
@@ -109,12 +110,13 @@
     }
   },
   "HarveyBedroom": {
-    "Npcs": ["Harvey"],
-    "DisplayName": "Harvey's Bedroom",
-    "Location": "HarveyRoom"
+    "Npcs": [ "Harvey" ],
+    "DisplayName": "tile_area.HarveyRoom",
+    "Location": "HarveyRoom",
+    "OverrideLocationName": true
   },
   "JasBedroom": {
-    "Npcs": ["Jas"],
+    "Npcs": [ "Jas" ],
     "DisplayName": "Jas's Bedroom",
     "Location": "AnimalShop",
     "TileRectangle": {
@@ -125,7 +127,7 @@
     }
   },
   "JodiKentBedroom": {
-    "Npcs": ["Jodi", "Kent"],
+    "Npcs": [ "Jodi", "Kent" ],
     "DisplayName": "Jodi and Kent's Bedroom",
     "Location": "SamHouse",
     "TileRectangle": {
@@ -136,12 +138,12 @@
     }
   },
   "LeahBedroom": {
-    "Npcs": ["Leah"],
+    "Npcs": [ "Leah" ],
     "DisplayName": "Leah's Bedroom",
     "Location": "LeahHouse"
   },
   "LewisBedroom": {
-    "Npcs": ["Lewis"],
+    "Npcs": [ "Lewis" ],
     "DisplayName": "Lewis's Bedroom",
     "Location": "ManorHouse",
     "TileRectangle": {
@@ -152,7 +154,7 @@
     }
   },
   "MarnieBedroom": {
-    "Npcs": ["Marnie"],
+    "Npcs": [ "Marnie" ],
     "DisplayName": "Marnie's Bedroom",
     "Location": "AnimalShop",
     "TileRectangle": {
@@ -163,7 +165,7 @@
     }
   },
   "MaruBedroom": {
-    "Npcs": ["Maru"],
+    "Npcs": [ "Maru" ],
     "DisplayName": "Maru's Bedroom",
     "Location": "ScienceHouse",
     "TileRectangle": {
@@ -174,7 +176,7 @@
     }
   },
   "PennyBedroom": {
-    "Npcs": ["Penny"],
+    "Npcs": [ "Penny" ],
     "DisplayName": "Penny's Bedroom",
     "Location": "Trailer",
     "TileRectangle": {
@@ -207,7 +209,7 @@
         "Y": 14
       }
     ],
-    "Npcs": ["Sam"],
+    "Npcs": [ "Sam" ],
     "DisplayName": "Sam's Bedroom",
     "Location": "SamHouse",
     "TileRectangle": {
@@ -218,12 +220,13 @@
     }
   },
   "SebastianBedroom": {
-    "Npcs": ["Sebastian"],
-    "DisplayName": "Sebastian's Bedroom",
-    "Location": "SebastianRoom"
+    "Npcs": [ "Sebastian" ],
+    "DisplayName": "tile_area.SebastianRoom",
+    "Location": "SebastianRoom",
+    "OverrideLocationName": true
   },
   "ShaneBedroom": {
-    "Npcs": ["Shane"],
+    "Npcs": [ "Shane" ],
     "DisplayName": "Shane's Bedroom",
     "Location": "AnimalShop",
     "TileRectangle": {
@@ -234,7 +237,7 @@
     }
   },
   "VincentBedroom": {
-    "Npcs": ["Vincent"],
+    "Npcs": [ "Vincent" ],
     "DisplayName": "Vincent's Bedroom",
     "Location": "SamHouse",
     "TileRectangle": {
@@ -243,6 +246,66 @@
       "Width": 5,
       "Height": 5
     }
+  },
+  "Club": {
+    "DisplayName": "tile_area.Club",
+    "Location": "Club",
+    "OverrideLocationName": true
+  },
+  "IslandEast": {
+    "DisplayName": "tile_area.IslandEast",
+    "Location": "IslandEast",
+    "OverrideLocationName": true
+  },
+  "IslandHut": {
+    "DisplayName": "tile_area.IslandHut",
+    "Location": "IslandHut",
+    "OverrideLocationName": true
+  },
+  "IslandNorth": {
+    "DisplayName": "tile_area.IslandNorth",
+    "Location": "IslandNorth",
+    "OverrideLocationName": true
+  },
+  "IslandSouth": {
+    "DisplayName": "tile_area.IslandSouth",
+    "Location": "IslandSouth",
+    "OverrideLocationName": true
+  },
+  "IslandWest": {
+    "DisplayName": "tile_area.IslandWest",
+    "Location": "IslandWest",
+    "OverrideLocationName": true
+  },
+  "LeoTreeHouse": {
+    "DisplayName": "tile_area.LeoTreeHouse",
+    "Location": "LeoTreeHouse",
+    "OverrideLocationName": true
+  },
+  "QiNutRoom": {
+    "DisplayName": "Strings\\WorldMap:GingerIsland_West_QiWalnutRoom",
+    "Location": "QiNutRoom",
+    "OverrideLocationName": true
+  },
+  "SandyHouse": {
+    "DisplayName": "tile_area.SandyHouse",
+    "Location": "SandyHouse",
+    "OverrideLocationName": true
+  },
+  "SkullCave": {
+    "DisplayName": "tile_area.SkullCave",
+    "Location": "SkullCave",
+    "OverrideLocationName": true
+  },
+  "WitchSwamp": {
+    "DisplayName": "tile_area.WitchSwamp",
+    "Location": "WitchSwamp",
+    "OverrideLocationName": true
+  },
+  "WitchWarpCave": {
+    "DisplayName": "tile_area.WitchWarpCave",
+    "Location": "WitchWarpCave",
+    "OverrideLocationName": true
   },
   "TownIceCreamStand": {
     "DisplayName": "tile_area.TownIceCreamStand",

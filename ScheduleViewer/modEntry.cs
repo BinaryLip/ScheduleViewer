@@ -60,6 +60,10 @@ namespace ScheduleViewer
         private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
         {
             Schedule.LoadTileAreas();
+            if (Game1.IsMasterGame)
+            {
+                Schedule.ClearSchedules();
+            }
         }
 
         /// <inheritdoc cref="IGameLoopEvents.DayStarted"/>
@@ -126,6 +130,13 @@ namespace ScheduleViewer
                     name: () => this.Helper.Translation.Get("config.option.show_schedule_key.name"),
                     getValue: () => Config.ShowSchedulesKey,
                     setValue: value => Config.ShowSchedulesKey = value
+                );
+                configMenuApi.AddBoolOption(
+                    ModManifest,
+                    name: () => this.Helper.Translation.Get("config.option.use_address.name"),
+                    tooltip: () => this.Helper.Translation.Get("config.option.use_address.description"),
+                    getValue: () => Config.UseAddress,
+                    setValue: value => Config.UseAddress = value
                 );
                 configMenuApi.AddBoolOption(
                     ModManifest,
@@ -255,7 +266,9 @@ namespace ScheduleViewer
                         Schedule.ReceiveSchedules(e.ReadAs<(int, Dictionary<string, Schedule.NPCSchedule>)>());
                         break;
                     case ModMessageCurrentLocation:
-                        Schedule.UpdateCurrentLocation(e.ReadAs<(string, string)>());
+                        var (location, npcsToUpdate) = e.ReadAs<(string, string[])>();
+                        string locationName = Schedule.PrettyPrintLocationName(location);
+                        Schedule.UpdateCurrentLocation(locationName, npcsToUpdate);
                         break;
                 }
             }
@@ -264,15 +277,18 @@ namespace ScheduleViewer
         /// <inheritdoc cref="IWorldEvents.NpcListChanged"/>
         private void OnNpcListChanged(object sender, NpcListChangedEventArgs e)
         {
-            // update current location for NPCs that are ignoring their schedule
+            // update current location for NPCs
             if (Game1.IsMasterGame && Schedule.HasSchedules())
             {
-                var npcsToUpdate = Schedule.GetSchedules().Where(schedule => e.Added.Any(npc => npc.Name.Equals(schedule.Key)));
-                string locationName = Schedule.PrettyPrintLocationName(e.Location);
-                foreach (var npc in npcsToUpdate)
+                string[] npcsToUpdate = Schedule.GetSchedules()
+                    .Where(schedule => e.Added.Any(npc => npc.Name.Equals(schedule.Key))) // find npcs that moved locations
+                    .Select(item => item.Key) // select their internal name
+                    .ToArray();
+                if (npcsToUpdate.Length > 0)
                 {
-                    Schedule.UpdateCurrentLocation((npc.Key, locationName));
-                    this.Helper.Multiplayer.SendMessage<(string, string)>((npc.Key, locationName), ModMessageCurrentLocation);
+                    string locationName = Schedule.PrettyPrintLocationName(e.Location);
+                    Schedule.UpdateCurrentLocation(locationName, npcsToUpdate);
+                    this.Helper.Multiplayer.SendMessage<(string, string[])>((e.Location.Name, npcsToUpdate), ModMessageCurrentLocation);
                 }
             }
         }
