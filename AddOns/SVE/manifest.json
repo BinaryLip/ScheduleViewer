@@ -1,10 +1,10 @@
 {
-  "Name": "Schedule Viewer - SVE Tile Areas",
+  "Name": "Schedule Viewer - SVE Add-on",
   "Author": "BinaryLip",
   "Version": "1.0.0",
   "Description": "Enhances schedule details for Stardew Valley Expanded NPCs in Schedule Viewer",
-  "UniqueID": "BinaryLip.SVETileAreas",
-  "UpdateKeys": ["Nexus:19305@SVETileAreas"],
+  "UniqueID": "BinaryLip.SVEAddOn",
+  "UpdateKeys": ["Nexus:19305@SVEAddOn"],
   "ContentPackFor": {
     "UniqueID": "Pathoschild.ContentPatcher"
   },
