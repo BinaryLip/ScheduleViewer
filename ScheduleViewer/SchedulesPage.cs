@@ -8,7 +8,6 @@ using StardewValley.Quests;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace ScheduleViewer
 {
@@ -59,7 +58,7 @@ namespace ScheduleViewer
             : base(Game1.uiViewport.Width / 2 - (800 + IClickableMenu.borderWidth * 2) / 2, Game1.uiViewport.Height / 2 - (600 + IClickableMenu.borderWidth * 2) / 2, 800 + 36 + IClickableMenu.borderWidth * 2, 600 + IClickableMenu.borderWidth * 2, showUpperRightCloseButton: true)
         {
             // filter npcs
-            IEnumerable<KeyValuePair<string, Schedule.NPCSchedule>> filteredSchedules = Schedule.GetSchedules(ModEntry.Config.OnlyShowSocializableNPCs, ModEntry.Config.OnlyShowMetNPCs);
+            IEnumerable<KeyValuePair<string, Schedule.NPCSchedule>> filteredSchedules = Schedule.GetSchedules(new(ModEntry.Config.IgnoredNPCs, ModEntry.Config.OnlyShowSocializableNPCs, ModEntry.Config.OnlyShowMetNPCs));
             // sort npcs
             filteredSchedules = ModEntry.Config.NPCSortOrder switch
             {
@@ -76,14 +75,13 @@ namespace ScheduleViewer
             int itemIndex = 0;
             int lastQuestIndex = -1;
             Rectangle spriteBounds = new(base.xPositionOnScreen + IClickableMenu.borderWidth + 4, base.yPositionOnScreen + IClickableMenu.borderWidth + spriteSize / 2, 260, spriteSize);
-            Regex nameRegex = new($"-{ModEntry.ModHelper.ModRegistry.ModID}-\\d");
             foreach (var item in filteredSchedules)
             {
                 // if not host then need to get sprite info
                 if (item.Value.NPC == null)
                 {
                     // clear out extra count details from name (see Schedule.cs:241)
-                    NPC npc = Game1.getCharacterFromName(nameRegex.Replace(item.Key, ""));
+                    NPC npc = Game1.getCharacterFromName(Schedule.GetNameFromScheduleKey(item.Key));
                     item.Value.NPC = npc;
                 }
                 // update CanAccess variable

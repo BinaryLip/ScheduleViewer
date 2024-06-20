@@ -10,16 +10,17 @@ Run the game using SMAPI.
 
 ## Config Options
 
-| setting                           | default                | what it does                                                                                           |
-| --------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------ |
-| `ShowSchedulesKey`                | `V`                    | the key to open the Schedule Viewer                                                                    |
-| `UseAddress`                      | `true`                 | use Pelican Town address instead of "Home of ..." for schedule entries i.e. "2 Willow Lane" instead of "Home of Emily & Haley". (Changes may not take effect until the next day.) |
-| `DisableHover`                    | `false`                | don't show tile, facing direction, and animation info on hover                                         |
-| `UseLargerFontForScheduleDetails` | `false`                | use a larger font size on the Schedule Details page (longer location names may get cut off if enabled) |
-| `NPCSortOrder`                    | Alphabetical Ascending | the order the NPCs are sorted in the Schedule Viewer (Alphabetical/Heart Level & Ascending/Descending) |
+| setting                           | default                 | what it does                                                                                           |
+| --------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------ |
+| `ShowSchedulesKey`                | `V`                     | the key to open the Schedule Viewer                                                                    |
+| `UseAddress`                      | `true`                  | use Pelican Town address instead of "Home of ..." for schedule entries i.e. "2 Willow Lane" instead of "Home of Emily & Haley". (Changes may not take effect until the next day.) |
+| `DisableHover`                    | `false`                 | don't show tile, facing direction, and animation info on hover                                         |
+| `UseLargerFontForScheduleDetails` | `false`                 | use a larger font size on the Schedule Details page (longer location names may get cut off if enabled) |
+| `NPCSortOrder`                    | Alphabetical Ascending  | the order the NPCs are sorted in the Schedule Viewer (Alphabetical/Heart Level & Ascending/Descending) |
 | **Filters**                       |
-| `OnlyShowMetNPCs`                 | `false`                | hides NPCs the farmer hasn't met yet                                                                   |
-| `OnlyShowSocializableNPCs`        | `true`                 | hides NPCs you can't socialize with i.e. Gunther or Sandy before the bus is repaired                   |
+| `OnlyShowMetNPCs`                 | `false`                 | hides NPCs the farmer hasn't met yet                                                                   |
+| `OnlyShowSocializableNPCs`        | `true`                  | hides NPCs you can't socialize with i.e. Gunther or Sandy before the bus is repaired                   |
+| `IgnoredNPCs`                     | `Dwarf, Krobus, Wizard` | hides the listed NPCs. Prepending a value with \"^\" will match any names that start with that value (ex: \"^Ha\" will hide both Haley and Harvey) |
 
 ## Compatibility
 
@@ -65,7 +66,7 @@ on the wiki for help contributing translations.
 | Language   | Status                           | Contributors                                            |
 | ---------- | -------------------------------- | ------------------------------------------------------- |
 | Chinese    | [↻](ScheduleViewer/i18n/zh.json) | [RegenLicht](https://www.nexusmods.com/users/102031818) |
-| French     | [✓](ScheduleViewer/i18n/fr.json) | YoshY                                                   |
+| French     | [✓](ScheduleViewer/i18n/fr.json) | YoshY, [CaranudLapin](https://github.com/CaranudLapin)  |
 | German     | [❑](ScheduleViewer/i18n)         | &nbsp;                                                  |
 | Hungarian  | [❑](ScheduleViewer/i18n)         | &nbsp;                                                  |
 | Italian    | [❑](ScheduleViewer/i18n)         | &nbsp;                                                  |

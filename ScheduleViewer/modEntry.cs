@@ -9,6 +9,7 @@ using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace ScheduleViewer
 {
@@ -176,6 +177,14 @@ namespace ScheduleViewer
                     getValue: () => Config.OnlyShowSocializableNPCs,
                     setValue: value => Config.OnlyShowSocializableNPCs = value
                 );
+                Regex separators = new(",\\s?");
+                configMenuApi.AddTextOption(
+                    ModManifest,
+                    name: () => this.Helper.Translation.Get("config.option.ignored_npcs.name"),
+                    tooltip: () => this.Helper.Translation.Get("config.option.ignored_npcs.description"),
+                    getValue: () => String.Join(", ", Config.IgnoredNPCs),
+                    setValue: value => Config.IgnoredNPCs = string.IsNullOrEmpty(value) ? Array.Empty<string>() : separators.Split(value)
+                );
             }
 
             var mobilePhoneApi = Helper.ModRegistry.GetApi<IMobilePhoneApi>("JoXW.MobilePhone");
@@ -278,7 +287,7 @@ namespace ScheduleViewer
         private void OnNpcListChanged(object sender, NpcListChangedEventArgs e)
         {
             // update current location for NPCs
-            if (Game1.IsMasterGame && Schedule.HasSchedules())
+            if (Game1.IsMasterGame && (Schedule.HasSchedules() || this.Helper.Multiplayer.GetConnectedPlayers().Any()))
             {
                 string[] npcsToUpdate = Schedule.GetSchedules()
                     .Where(schedule => e.Added.Any(npc => npc.Name.Equals(schedule.Key))) // find npcs that moved locations
