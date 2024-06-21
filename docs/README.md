@@ -65,17 +65,17 @@ on the wiki for help contributing translations.
 
 | Language   | Status                           | Contributors                                            |
 | ---------- | -------------------------------- | ------------------------------------------------------- |
-| Chinese    | [↻](ScheduleViewer/i18n/zh.json) | [RegenLicht](https://www.nexusmods.com/users/102031818) |
-| French     | [✓](ScheduleViewer/i18n/fr.json) | YoshY, [CaranudLapin](https://github.com/CaranudLapin)  |
+| Chinese    | [✓](ScheduleViewer/i18n/zh.json) | [RegenLicht](https://www.nexusmods.com/users/102031818), [Awassakura](https://www.nexusmods.com/users/104142703) |
+| French     | [↻](ScheduleViewer/i18n/fr.json) | YoshY, [CaranudLapin](https://github.com/CaranudLapin)  |
 | German     | [❑](ScheduleViewer/i18n)         | &nbsp;                                                  |
 | Hungarian  | [❑](ScheduleViewer/i18n)         | &nbsp;                                                  |
 | Italian    | [❑](ScheduleViewer/i18n)         | &nbsp;                                                  |
 | Japanese   | [❑](ScheduleViewer/i18n)         | &nbsp;                                                  |
-| Korean     | [✓](ScheduleViewer/i18n/ko.json) | [cheesecats](https://www.nexusmods.com/users/88438538)  |
-| Portuguese | [✓](ScheduleViewer/i18n/pt.json) | [Sxdic](https://www.nexusmods.com/users/34556965)       |
+| Korean     | [↻](ScheduleViewer/i18n/ko.json) | [cheesecats](https://www.nexusmods.com/users/88438538)  |
+| Portuguese | [↻](ScheduleViewer/i18n/pt.json) | [Sxdic](https://www.nexusmods.com/users/34556965)       |
 | Russian    | [❑](ScheduleViewer/i18n)         | &nbsp;                                                  |
-| Spanish    | [✓](ScheduleViewer/i18n/es.json) | [36095](https://github.com/36095)                       |
-| Turkish    | [✓](ScheduleViewer/i18n/tr.json) | [KzyNothh](https://www.nexusmods.com/users/94536368)    |
+| Spanish    | [↻](ScheduleViewer/i18n/es.json) | [36095](https://github.com/36095)                       |
+| Turkish    | [↻](ScheduleViewer/i18n/tr.json) | [KzyNothh](https://www.nexusmods.com/users/94536368)    |
 
 ## See also
 
