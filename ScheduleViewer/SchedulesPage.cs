@@ -48,8 +48,6 @@ namespace ScheduleViewer
 
         private readonly Texture2D icons = ModEntry.ModHelper.ModContent.Load<Texture2D>("assets/Icons.png");
 
-        public Friendship emptyFriendship = new();
-
         /// <summary>LookupAnything</summary>
         public NPC hoveredNpc;
 
@@ -474,13 +472,24 @@ namespace ScheduleViewer
             // draw sprite
             sprite.draw(b);
 
+            // draw quest icon
+            this.questIcons[i]?.draw(b);
+
+            // draw talked to icon
+            Game1.player.friendshipData.TryGetValue(npc?.Name, out Friendship friendship);
+            if (friendship != null && friendship.TalkedToToday)
+            {
+                b.Draw(Game1.mouseCursors2, new Rectangle(sprite.bounds.Right - 36, sprite.bounds.Bottom + 4, 26, 22), new Rectangle(180, 175, 13, 11), Color.White);
+            } 
+            else
+            {
+                b.Draw(icons, new Rectangle(sprite.bounds.Right - 34, sprite.bounds.Bottom + 4, 26, 22), new Rectangle(2, 60, 13, 11), Color.White);
+            }
+
             // draw name
             float lineHeight = Game1.smallFont.MeasureString("W").Y;
             float russianOffsetY = ((LocalizedContentManager.CurrentLanguageCode == LocalizedContentManager.LanguageCode.ru || LocalizedContentManager.CurrentLanguageCode == LocalizedContentManager.LanguageCode.ko) ? ((0f - lineHeight) / 2f) : 0f);
             b.DrawString(Game1.dialogueFont, displayName, new Vector2((float)(base.xPositionOnScreen + IClickableMenu.borderWidth * 3 / 2 + 64 - 20 + 96) - Game1.dialogueFont.MeasureString(displayName).X / 2f, (float)(sprite.bounds.Y + 48) + russianOffsetY - 20), Game1.textColor);
-
-            // draw quest icon
-            this.questIcons[i]?.draw(b);
 
             int x = sprite.bounds.Right + partitionSize;
             int y = sprite.bounds.Y - 4;
