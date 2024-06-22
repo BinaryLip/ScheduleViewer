@@ -63,19 +63,19 @@ on the wiki for help contributing translations.
 
 (❑ = untranslated, ↻ = partly translated, ✓ = fully translated)
 
-| Language   | Status                           | Contributors                                            |
-| ---------- | -------------------------------- | ------------------------------------------------------- |
-| Chinese    | [✓](ScheduleViewer/i18n/zh.json) | [RegenLicht](https://www.nexusmods.com/users/102031818), [Awassakura](https://www.nexusmods.com/users/104142703) |
-| French     | [↻](ScheduleViewer/i18n/fr.json) | YoshY, [CaranudLapin](https://github.com/CaranudLapin)  |
-| German     | [❑](ScheduleViewer/i18n)         | &nbsp;                                                  |
-| Hungarian  | [❑](ScheduleViewer/i18n)         | &nbsp;                                                  |
-| Italian    | [❑](ScheduleViewer/i18n)         | &nbsp;                                                  |
-| Japanese   | [❑](ScheduleViewer/i18n)         | &nbsp;                                                  |
-| Korean     | [↻](ScheduleViewer/i18n/ko.json) | [cheesecats](https://www.nexusmods.com/users/88438538)  |
-| Portuguese | [↻](ScheduleViewer/i18n/pt.json) | [Sxdic](https://www.nexusmods.com/users/34556965)       |
-| Russian    | [❑](ScheduleViewer/i18n)         | &nbsp;                                                  |
-| Spanish    | [↻](ScheduleViewer/i18n/es.json) | [36095](https://github.com/36095)                       |
-| Turkish    | [↻](ScheduleViewer/i18n/tr.json) | [KzyNothh](https://www.nexusmods.com/users/94536368)    |
+| Language   | Main Mod Status                     | SVE Add-on Status                | Contributors                                            |
+| ---------- | ----------------------------------- | -------------------------------- | ------------------------------------------------------- |
+| Chinese    | [✓](../ScheduleViewer/i18n/zh.json) | [✓](../AddOns/SVE/i18n/zh.json) | [RegenLicht](https://www.nexusmods.com/users/102031818), [Awassakura](https://www.nexusmods.com/users/104142703), [HanaGee](https://www.nexusmods.com/users/121177218) |
+| French     | [↻](../ScheduleViewer/i18n/fr.json) | [❑](../AddOns/SVE/i18n)         | YoshY, [CaranudLapin](https://github.com/CaranudLapin)  |
+| German     | [❑](../ScheduleViewer/i18n)         | [❑](../AddOns/SVE/i18n)         | &nbsp;                                                  |
+| Hungarian  | [❑](../ScheduleViewer/i18n)         | [❑](../AddOns/SVE/i18n)         | &nbsp;                                                  |
+| Italian    | [❑](../ScheduleViewer/i18n)         | [❑](../AddOns/SVE/i18n)         | &nbsp;                                                  |
+| Japanese   | [❑](../ScheduleViewer/i18n)         | [❑](../AddOns/SVE/i18n)         | &nbsp;                                                  |
+| Korean     | [↻](../ScheduleViewer/i18n/ko.json) | [❑](../AddOns/SVE/i18n)         | [cheesecats](https://www.nexusmods.com/users/88438538)  |
+| Portuguese | [↻](../ScheduleViewer/i18n/pt.json) | [❑](../AddOns/SVE/i18n)         | [Sxdic](https://www.nexusmods.com/users/34556965)       |
+| Russian    | [❑](../ScheduleViewer/i18n)         | [❑](../AddOns/SVE/i18n)         | &nbsp;                                                  |
+| Spanish    | [↻](../ScheduleViewer/i18n/es.json) | [❑](../AddOns/SVE/i18n)         | [36095](https://github.com/36095)                       |
+| Turkish    | [↻](../ScheduleViewer/i18n/tr.json) | [❑](../AddOns/SVE/i18n)         | [KzyNothh](https://www.nexusmods.com/users/94536368)    |
 
 ## See also
 
