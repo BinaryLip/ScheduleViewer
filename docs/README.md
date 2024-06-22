@@ -41,7 +41,7 @@ No known mod conflicts
 - [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098) - UI for editing config options
 - [Lookup Anything](https://www.nexusmods.com/stardewvalley/mods/541) - able to lookup NPC information from the Schedule Viewer and details pages
 - [Mobile Phone Continued](https://www.nexusmods.com/stardewvalley/mods/21017) - able to open the Schedule Viewer from the Mobile Phone
-- [Stardew Valley Expanded](https://www.nexusmods.com/stardewvalley/mods/3753) - see [SVETileAreas](..\SVETileAreas) for optional download that enhances schedule details for custom SVE locations
+- [Stardew Valley Expanded](https://www.nexusmods.com/stardewvalley/mods/3753) - see [Schedule Viewer - SVE Add-on](../AddOns/SVE/) for optional download that enhances schedule details for custom SVE locations
 - [Toolbar Icons](https://www.nexusmods.com/stardewvalley/mods/21017) - able to open the Schedule Viewer from a toolbar icon
 
 To integrate your mod see the [author guide](author-guide.md) for more info.

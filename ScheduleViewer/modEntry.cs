@@ -107,6 +107,12 @@ namespace ScheduleViewer
         /// <inheritdoc cref="IGameLoopEvents.GameLaunched"/>
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
         {
+            // check if SVE is installed and prompt SVE Add-on
+            if (Helper.ModRegistry.IsLoaded("FlashShifter.SVECode") && !Helper.ModRegistry.IsLoaded("BinaryLip.SVEAddOn"))
+            {
+                Console.Log("It looks like you have Stardew Valley Expanded installed. There is an add-on available for Schedule Viewer that enhances schedule details for SVE NPCs and locations. See the optional files section of NexusMods or CurseForge for the download!", LogLevel.Alert);
+            }
+
             static ModConfig.SortType parseSortType(string value)
             {
                 _ = Enum.TryParse(value, out ModConfig.SortType sortType);
