@@ -18,6 +18,8 @@
   "config.option.only_show_met_npcs.description": "Masquer les PNJ auxquels vous n'avez jamais parlé auparavant dans la liste.",
   "config.option.only_show_socializable_npcs.name": "Masquer les PNJ non socialisables",
   "config.option.only_show_socializable_npcs.description": "Masquer les PNJ non socialisables dans la liste.\nPar exemple Gunther ou Sandy avant que le bus ne soit réparé) ",
+  "config.option.ignored_npcs.name": "PNJ ignorés",
+  "config.option.ignored_npcs.description": "Une liste (séparée par des virgules) des PNJ à cacher dans la liste. Commencer un nom avec \"^\" s’appliquera à tous les noms qui commencent avec cette valeur (par exemple : ^Ha cachera à la fois Haley et Harvey).",
   "error.mismatch_mods": "Avertissement! Vous et le joueur hôte avez des mods/versions de mod différents qui peuvent affecter l'exactitude des plannings. Voir le journal SMAPI pour plus de détails.",
   "error.mismatch_game_version": "Avertissement! Vous et le joueur hôte disposez de versions de jeu différentes, ce qui peut affecter l'exactitude des plannings.",
   "location_hover_text": "Sur la case ({{x}}, {{y}}) orienté vers {{facingDirection}}",
