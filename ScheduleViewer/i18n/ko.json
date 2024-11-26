@@ -1,6 +1,7 @@
 {
   "config.title.general": "일반 옵션:",
-  "config.option.show_schedule_key.name": "주민 일정 표시 키 ",
+  "config.option.show_schedule_key.name": "단축키",
+  "config.option.show_schedule_key.description": "주민 일정 표시 키 ",
   "config.option.disable_hover.name": "커서 위치 시 상세 정보 숨기기",
   "config.option.disable_hover.description": "커서 위치 시 좌표, 마주보는 효과, 애니메이션 등을 표시하지 않습니다.",
   "config.option.use_large_font.name": "상세 정보를 표시할 경우 더 큰 글씨를 사용",

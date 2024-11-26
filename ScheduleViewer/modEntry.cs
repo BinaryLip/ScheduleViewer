@@ -132,9 +132,10 @@ namespace ScheduleViewer
 
                 // add some config options
                 configMenuApi.AddSectionTitle(ModManifest, () => this.Helper.Translation.Get("config.title.general"));
-                configMenuApi.AddKeybind(
+                configMenuApi.AddKeybindList(
                     ModManifest,
                     name: () => this.Helper.Translation.Get("config.option.show_schedule_key.name"),
+                    tooltip: () => this.Helper.Translation.Get("config.option.show_schedule_key.description"),
                     getValue: () => Config.ShowSchedulesKey,
                     setValue: value => Config.ShowSchedulesKey = value
                 );
@@ -204,7 +205,7 @@ namespace ScheduleViewer
             var toolbarIconsApi = Helper.ModRegistry.GetApi<IToolbarIconsApi>("furyx639.ToolbarIcons");
             if (toolbarIconsApi != null)
             {
-                toolbarIconsApi.AddToolbarIcon(ModManifest.UniqueID, Helper.ModContent.GetInternalAssetName("assets/Icons.png").BaseName, new Rectangle(0, 24, 16, 16), this.Helper.Translation.Get("schedule_details_page.header"));
+                toolbarIconsApi.AddToolbarIcon(ModManifest.UniqueID, Helper.ModContent.GetInternalAssetName("assets/Icons.png").BaseName, new Rectangle(0, 32, 16, 16), this.Helper.Translation.Get("schedule_details_page.header"));
                 toolbarIconsApi.Subscribe(args =>
                 {
                     if (args.Id.Equals(ModManifest.UniqueID))
@@ -225,7 +226,7 @@ namespace ScheduleViewer
             try
             {
                 // open menu
-                if (e.Pressed.Contains(Config.ShowSchedulesKey))
+                if (Config.ShowSchedulesKey.JustPressed())
                 {
                     // open if no conflict
                     if (Game1.activeClickableMenu == null)

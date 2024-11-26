@@ -1,6 +1,7 @@
 {
   "config.title.general": "Opções Gerais:",
-  "config.option.show_schedule_key.name": "Tecla para Mostrar Horários dos NPCs",
+  "config.option.show_schedule_key.name": "Tecla de atalho",
+  "config.option.show_schedule_key.description": "Tecla para Mostrar Horários dos NPCs",
   "config.option.disable_hover.name": "Ocultar detalhes ao passar o mouse",
   "config.option.disable_hover.description": "Não mostrar informações de blocos, direção e animação ao passar o mouse.",
   "config.option.use_large_font.name": "Usar fonte maior na página de detalhes",

@@ -1,6 +1,7 @@
 {
   "config.title.general": "Opciones Generales:",
   "config.option.show_schedule_key.name": "Tecla de acceso rápido",
+  "config.option.show_schedule_key.description": "",
   "config.option.disable_hover.name": "Ocultar detalles al superponer",
   "config.option.disable_hover.description": "No mostrar casilla, dirección, e información de la animación al pasar el ratón.",
   "config.option.use_large_font.name": "Usar fuente grande en detalles",

@@ -1,6 +1,7 @@
 {
   "config.title.general": "General Options:",
-  "config.option.show_schedule_key.name": "Show NPC Schedules key",
+  "config.option.show_schedule_key.name": "Hotkey",
+  "config.option.show_schedule_key.description": "The key(s) which show or hide the schedules.",
   "config.option.use_address.name": "Use address in schedules",
   "config.option.use_address.description": "Use Pelican Town address instead of \"Home of ...\" for schedule entries i.e. \"2 Willow Lane\" instead of \"Home of Emily & Haley\". (Changes may not take effect until the next day.)",
   "config.option.disable_hover.name": "Hide details on hover",

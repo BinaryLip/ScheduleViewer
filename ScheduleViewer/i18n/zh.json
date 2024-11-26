@@ -1,6 +1,7 @@
 {
   "config.title.general": "常规选项：",
-  "config.option.show_schedule_key.name": "显示NPC日程密钥",
+  "config.option.show_schedule_key.name": "热键",
+  "config.option.show_schedule_key.description": "显示NPC日程密钥",
   "config.option.use_address.name": "在日程中使用地址",
   "config.option.use_address.description": "在日程条目中使用鹈鹕镇的地址，而不是使用“...的家”，例如使用“柳巷 2号”代替“艾米丽 & 海莉的家”。（更改可能要到第二天才会生效。）",
   "config.option.disable_hover.name": "悬停隐藏细节",

@@ -1,4 +1,5 @@
 ﻿using StardewModdingAPI;
+using StardewModdingAPI.Utilities;
 using System;
 
 namespace ScheduleViewer.Interfaces
@@ -19,14 +20,14 @@ namespace ScheduleViewer.Interfaces
         /// <param name="tooltip">The tooltip text shown when the cursor hovers on the title, or <c>null</c> to disable the tooltip.</param>
         void AddSectionTitle(IManifest mod, Func<string> text, Func<string> tooltip = null);
 
-        /// <summary>Add a key binding at the current position in the form.</summary>
+        /// <summary>Add a key binding list at the current position in the form.</summary>
         /// <param name="mod">The mod's manifest.</param>
         /// <param name="getValue">Get the current value from the mod config.</param>
         /// <param name="setValue">Set a new value in the mod config.</param>
         /// <param name="name">The label text to show in the form.</param>
         /// <param name="tooltip">The tooltip text shown when the cursor hovers on the field, or <c>null</c> to disable the tooltip.</param>
         /// <param name="fieldId">The unique field ID for use with <see cref="OnFieldChanged"/>, or <c>null</c> to auto-generate a randomized ID.</param>
-        void AddKeybind(IManifest mod, Func<SButton> getValue, Action<SButton> setValue, Func<string> name, Func<string> tooltip = null, string fieldId = null);
+        void AddKeybindList(IManifest mod, Func<KeybindList> getValue, Action<KeybindList> setValue, Func<string> name, Func<string> tooltip = null, string fieldId = null);
 
         /// <summary>Add a string option at the current position in the form.</summary>
         /// <param name="mod">The mod's manifest.</param>

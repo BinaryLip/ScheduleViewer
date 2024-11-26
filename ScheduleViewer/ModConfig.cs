@@ -1,4 +1,5 @@
 ﻿using StardewModdingAPI;
+using StardewModdingAPI.Utilities;
 
 namespace ScheduleViewer
 {
@@ -12,7 +13,7 @@ namespace ScheduleViewer
             HeartsDescending = 3
         }
 
-        public SButton ShowSchedulesKey { get; set; } = SButton.V;
+        public KeybindList ShowSchedulesKey { get; set; } = new KeybindList(SButton.V);
         public bool UseAddress { get; set; } = true;
         public bool DisableHover { get; set; } = false;
         public bool UseLargerFontForScheduleDetails { get; set; } = false;
